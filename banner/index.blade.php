@@ -15,17 +15,16 @@
             <div class="fillterDrpdown">
                 <div class="">
                     <div class="row">
+
                         <div class="col-md-2">
-                            <select name="banserch" id="banserch" class="form-select"
-                                aria-label="Default select example">
-                                <option value="">Title</option>
-                                @if(!$bann->isEmpty())
-                                @foreach($bann as $banne)
-                                <option value="{{ $banne->title}}"
-                                    {{ Request::get('banserch') == $banne->title  ? 'selected="selected"' : '' }}>
-                                    {{ $banne->title}}</option>
-                                @endforeach
-                                @endif
+                            <input name="banserch" id="banserch" placeholder="search by title"
+                                value="{{ Request::get('banserch')}}">
+                        </div>
+                        <div class="col-md-2">
+                            <select name="status" id="status" class="form-select" aria-label="Default select example">
+                                <option value="">Status</option>
+                                <option value="1">Active</option>
+                                <option value="0">Deactive</option>
                             </select>
                         </div>
                         <div class="col-md-2 d-flex">
@@ -36,91 +35,62 @@
                     </div>
                 </div>
             </div>
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Image</th>
-                        <th>Title</th>
-                        <!-- <th>Links</th> -->
-                        <th>Description</th>
-                        <th>Status</th>
-                        <!-- <th>Created_at</th> -->
-                        <th class="text-center" colspan="3">Action</th>
-                    </tr>
-                </thead>
-                <tbody id="listdata">
-                    @if(!$banner->isEmpty())
-                    @foreach($banner as $new)
-                    <tr>
-                        <td> <img src="{{ asset('uploads/BannerImg/'.$new->bannerImg) }}"
-                                style="height: 30px;width:30px;"></td>
-                        <td>
-                            {{ $new->title }}
-                        </td>
-
-                        <td>
-                            {{ $new->description }}
-                        </td>
-                        <!-- <td>
-                            {{ $new->created_at }}
-                        </td> -->
-                        <td class="text-center">
-                            @if($new->status =='0')
-                            <span id="bookForm" class="btn btn-danger btn-rounded btn-sm"
-                                onclick="changeStatus('{{ $new->id }}',1)">Deactive</span>
-
-                            @else
-                            @if($new->status =='1')
-                            <span id="bookForm" class="btn btn-success btn-rounded btn-sm"
-                                onclick="changeStatus('{{ $new->id }}',0 )">Active</span>
-                            @endif
-                            @endif
-
-                        </td>
-                        <td>
-                            <a href="{{ route('banner.show', $new->id) }}"
-                                class="fa fa-eye">View</a>
-                        </td>
-                        <td>
-                            <a href="{{ route('banner.edit', $new->id) }}"
-                                class="fa fa-edit">Edit</a>
-                        </td>
-                        <td>
-                            <span>
-                                <form method="POST" action="{{ route('banner.destroy', $new->id) }}">
-                                    @csrf
-                                    @method('DELETE')
-                                    <!-- {{ method_field('delete') }} -->
-                                    <button type="submit" class="btn btn-outline-danger  ">delete</button>
-                                </form>
-                            </span>
-                        </td>
-                    </tr>
-                    @endforeach
-                    @else
-                    <p> Note : Banner Is Empty ?.</p>
-                    @endif
-                </tbody>
-            </table>
+            <div id="listdata">
+                @include('admin.banner.data')
+            </div>
         </div>
-        {!! $banner->withQueryString()->links('pagination::bootstrap-5') !!}
     </div>
 </div>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+  <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script type="text/javascript">
-function getdata() {
+function getdata(page = 0) {
     var banserch = $('#banserch').val();
+    var status = $('#status').val();
     $.ajax({
-        url: "{{ route('banner.index') }}",
+        url: "{{ route('banner.index') }}?page=" + page,
         type: "GET",
         data: {
             'banserch': banserch,
+            'status': status,
         },
         dataType: 'html',
         success: function(data) {
-            $('#listdata').html(data);
+            $('#listdata').empty().html(data);
+            location.hash = page;
         }
     })
 }
+
+
+$(document).ready(function() {
+    $(document).on('click', '.pagination a', function(event) {
+        $('li').removeClass('active');
+
+        $(this).parent('li').addClass('active');
+
+        event.preventDefault();
+
+        var myurl = $(this).attr('href');
+
+        var page = $(this).attr('href').split('page=')[1];
+
+        getdata(page);
+
+    });
+
+    $(window).on('hashchange', function() {
+        if (window.location.hash) {
+            var page = window.location.hash.replace('#', '');
+            if (page == Number.NaN || page <= 0) {
+                return false;
+            } else {
+                getdata(page);
+            }
+        }
+    });
+});
+
 
 
 function changeStatus(id, status) {
@@ -156,5 +126,37 @@ function changeStatus(id, status) {
         });
 
 }
+
+$(function() {
+    $('table.db tbody').sortable({
+        'containment': 'parent',
+        'revert': true,
+        helper: function(e, tr) {
+            var $originals = tr.children();
+            var $helper = tr.clone();
+            $helper.children().each(function(index) {
+                $(this).width($originals.eq(index).width());
+            });
+            return $helper;
+        },
+
+        update: function(event, ui) {
+            $.ajax({
+                url: "{{ route('banner-reposition') }}",
+                type: "Post",
+                dataType: 'json',
+                data: $(this).sortable('serialize') + "&_token=" + '{{ csrf_token() }}',
+                success: function(data) {
+                    if (!data.success) {
+                        alert('Whoops, something went wrong :/');
+                    }
+                }
+            });
+
+
+        }
+    });
+
+});
 </script>
 @endsection

@@ -6,9 +6,6 @@
         <div class="card-body">
             <div class="d-flex justify-content-between mb-3">
                 <h4 class="card-title mb-0">All Transaction</h4>
-
-                <!-- <a href="" class="btn btn-primary  btn-roundedmt-5 float-right">Add
-                    Sponsor Type </a> -->
             </div>
             @if(Session::has('message'))
             <p class="alert alert-success">{{ Session::get('message') }}</p>
@@ -20,11 +17,11 @@
                         <div class="col-md-2">
                             <select name="p_type" id="p_type" class="form-select" aria-label="Default select example">
                                 <option value="">Project Type</option>
-                                @if(!$alldate->isEmpty())
-                                @foreach($alldate as $dat)
-                                <option value="{{ $dat->p_type}}"
-                                    {{ Request::get('p_type') == $dat->p_type  ? 'selected="selected"' : '' }}>
-                                    {{ $dat->p_type}}</option>
+                                @if(!$projectyp->isEmpty())
+                                @foreach($projectyp as $dat)
+                                <option value="{{ $dat->type}}"
+                                    {{ Request::get('p_type') == $dat->type  ? 'selected="selected"' : '' }}>
+                                    {{ $dat->type}}</option>
                                 @endforeach
                                 @endif
                             </select>
@@ -33,11 +30,11 @@
                             <select name="category" id="category" class="form-select"
                                 aria-label="Default select example">
                                 <option value="">Category Search</option>
-                                @if(!$alldate->isEmpty())
-                                @foreach($alldate as $dat)
-                                <option value="{{ $dat->category}}"
-                                    {{ Request::get('category') == $dat->category  ? 'selected="selected"' : '' }}>
-                                    {{ $dat->category}}</option>
+                                @if(!$categories->isEmpty())
+                                @foreach($categories as $dat)
+                                <option value="{{ $dat->title}}"
+                                    {{ Request::get('category') == $dat->title  ? 'selected="selected"' : '' }}>
+                                    {{ $dat->title}}</option>
                                 @endforeach
                                 @endif
                             </select>
@@ -45,41 +42,50 @@
                         <div class="col-md-2">
                             <select name="p_name" id="p_name" class="form-select" aria-label="Default select example">
                                 <option value="">Project Name</option>
-                                @if(!$alldate->isEmpty())
-                                @foreach($alldate as $dat)
-                                <option value="{{ $dat->p_name}}"
-                                    {{ Request::get('p_name') == $dat->p_name  ? 'selected="selected"' : '' }}>
-                                    {{ $dat->p_name}}</option>
+                                @if(!$projects->isEmpty())
+                                @foreach($projects as $dat)
+                                <option value="{{ $dat->project_name}}"
+                                    {{ Request::get('p_name') == $dat->project_name  ? 'selected="selected"' : '' }}>
+                                    {{ $dat->project_name}}</option>
                                 @endforeach
                                 @endif
                             </select>
                         </div>
-                        <div class="col-md-2">
-                            <select name="transactionId" id="transactionId" class="form-select"
-                                aria-label="Default select example">
-                                <option value="">TransactionId</option>
-                                @if(!$alldate->isEmpty())
-                                @foreach($alldate as $dat)
-                                <option value="{{ $dat->transactionId}}"
-                                    {{ Request::get('transactionId') == $dat->transactionId  ? 'selected="selected"' : '' }}>
-                                    {{ $dat->transactionId}}</option>
-                                @endforeach
-                                @endif
-                            </select>
+                        <div class="col-md-3">
+                            <input name="transactionId" id="transactionId" placeholder="search by transactionId..."
+                                value="{{ Request::get('transactionId')}}">
                         </div>
                         <div class="col-md-2">
                             <select name="payment_status" id="payment_status" class="form-select"
                                 aria-label="Default select example">
                                 <option value="">Payment Status</option>
-                                @if(!$alldate->isEmpty())
-                                @foreach($alldate as $dat)
-                                <option value="{{ $dat->payment_status}}"
-                                    {{ Request::get('payment_status') == $dat->payment_status  ? 'selected="selected"' : '' }}>
-                                    {{ $dat->payment_status}}</option>
-                                @endforeach
-                                @endif
+                                <option value="Paid">
+                                    Paid </option>
+                                <option value="Pending">
+                                    Pending</option>
+                                <option value="Failed">
+                                    Failed</option>
                             </select>
                         </div>
+                        
+                        <div class="col-md-3 mt-2">
+                            <div id="datepicker-popup" class="input-group date datepicker">
+                                <input type="text" placeholder="From Date" class="form-control" id="from_date"
+                                    name="from_date" value="{{ Request::get('datesearch')}}">
+                                <span class="input-group-addon input-group-append border-left">
+                                    <span class="mdi mdi-calendar input-group-text"></span>
+                                </span>
+                            </div>
+                        </div> 
+                        <div class="col-md-3 mt-2">
+                            <div id="datepicker-popups" class="input-group date datepickers">
+                                <input type="text" placeholder="To Date" class="form-control" id="to_date"
+                                    name="to_date" value="{{ Request::get('datesearch')}}">
+                                <span class="input-group-addon input-group-append border-left">
+                                    <span class="mdi mdi-calendar input-group-text"></span>
+                                </span>
+                            </div>
+                        </div> 
                     </div>
                     <div class="row justify-content-end mt-3 mr-2">
                         <div class="col-md-2 p-1 ">
@@ -94,93 +100,29 @@
 
                 </div>
             </div>
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>P Type</th>
-                        <th>P Name</th>
-                        <th>Category</th>
-                        <th>P Code</th>
-                        <!-- <th>p_id</th> -->
-                        <!-- <th>Invoice Id</th> -->
-                        <th>TransactionId</th>
-                        <th>Status</th>
-                        <!-- <th>Created_at</th> -->
-                        <th class="text-center" colspan="2">Action</th>
-                    </tr>
-                </thead>
-                <tbody id="projectlist">
-
-                    @if(!$data->isEmpty())
-                    @foreach($data as $tran)
-                    <tr>
-                        <td>
-                            {{ $tran->p_type }}
-                        </td>
-
-                        <td>
-                            {{ $tran->p_name }}
-                        </td>
-                        <td>
-                            {{ $tran->category }}
-                        </td>
-                        <td>
-                            {{ $tran->p_code }}
-                        </td>
-                        <!-- <td>
-                            {{ $tran->p_id }}
-                        </td> -->
-                        <!-- <td>
-                            {{ $tran->invoice_id }}
-                        </td> -->
-                        <td>
-                            {{ $tran->transactionId }}
-                        </td>
-                        <td>
-                            {{ $tran->payment_status }}
-                        </td>
-                        <!-- <td>
-                            {{ $tran->created_date }}
-                        </td> -->
-                        <td>
-                            <a href="{{ route('transaction.show',$tran->id)}}"
-                                class="fa fa-eye">View</a>
-                        </td>
-                        <td>
-                            <span>
-                                <form method="POST" action="{{ route('transaction.destroy',$tran->id) }}">
-                                    @csrf
-                                    @method('DELETE')
-                                    {{ method_field('delete') }}
-                                    <button type="submit" class="btn btn-outline-danger">delete</button>
-                                </form>
-                            </span>
-                        </td>
-                    </tr>
-                    @endforeach
-                    @else
-                    <p> Note : Transaction Is Empty ?.</p>
-                    @endif
-                </tbody>
-            </table>
+            <div id="projectlist">
+                @include('admin.transaction.data')
+            </div>
         </div>
-        {!! $data->withQueryString()->links('pagination::bootstrap-5') !!}
     </div>
 </div>
-
-<script type="text/javascript"> 
-function getdata() {
+<script type="text/javascript">
+function getdata(page = 0) {
     var p_type = $('#p_type').val();
+    var from_date = $('#from_date').val();
+    var to_date = $('#to_date').val();
     var category = $('#category').val();
     var p_name = $('#p_name').val();
     var transactionId = $('#transactionId').val();
     var payment_status = $('#payment_status').val();
 
     $.ajax({
-        url: "{{ route('transaction.index') }}",
+        url: "{{ route('transaction.index') }}?page=" + page,
         type: "GET",
         data: {
             'p_type': p_type,
+            'from_date': from_date,
+            'to_date': to_date,
             'category': category,
             'p_name': p_name,
             'transactionId': transactionId,
@@ -188,9 +130,52 @@ function getdata() {
         },
         dataType: 'html',
         success: function(data) {
-            $('#projectlist').html(data);
+            $('#projectlist').empty().html(data);
+            location.hash = page;
         }
     })
 }
+
+
+$(document).ready(function() {
+    $(document).on('click', '.pagination a', function(event) {
+        $('li').removeClass('active');
+
+        $(this).parent('li').addClass('active');
+
+        event.preventDefault();
+
+        var myurl = $(this).attr('href');
+
+        var page = $(this).attr('href').split('page=')[1];
+
+
+        getdata(page);
+
+    });
+
+    $(window).on('hashchange', function() {
+        if (window.location.hash) {
+            var page = window.location.hash.replace('#', '');
+            if (page == Number.NaN || page <= 0) {
+                return false;
+            } else {
+                getdata(page);
+            }
+        }
+    });
+});
+
+$(document).ready(function() {
+
+if ($("#datepicker-popup,#datepicker-popups".length)) {
+    $('#datepicker-popup,#datepicker-popups').datepicker({
+        enableOnReadonly: true,
+        format: 'yyyy-mm-dd',
+        autoclose: true,
+        todayHighlight: true,
+    });
+}
+});
 </script>
 @endsection
