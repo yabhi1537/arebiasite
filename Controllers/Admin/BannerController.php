@@ -5,14 +5,18 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\admin\BannerModel;
+use Illuminate\Support\Facades\File;
 use Session;
+use Illuminate\Support\Facades\Response;
+
 
 class BannerController extends Controller 
 {
-    
+     
     public function index(Request $request)
     {
         $baneserch = $request['banserch'] ?? "";
+        $status = $request['status'] ?? "";
 
 
         if($request->ajax()){
@@ -20,64 +24,21 @@ class BannerController extends Controller
             if($baneserch !="" ){
               $baneser->where('title', 'LIKE', "%$baneserch%")->get();
             }
-                  $banner =$baneser->Paginate(5);
-                  $input = '';
-                  if(!$banner->isEmpty()){
-                    foreach($banner as $new){
-                        $input .= '<tr>';
-                        $input .= '<td> <img src="'. asset('uploads/BannerImg/'.$new->bannerImg) .'"
-                        style="height: 30px;width:30px;"></td>
-                <td>
-                    '. $new->title .'
-                </td>
-                <td>
-                '. $new->description .'
-            </td>
-                <td class="text-center">';
-                    if($new->status =='0'){
-                    $input .= ' <span id="bookForm" class="btn btn-danger btn-rounded btn-sm "
-                        onclick="changeStatus('. $new->id .',1)">Deactive</span>';
-
-                    }elseif($new->status =='1'){
-                    $input .= '<span id="bookForm" class="btn btn-success btn-rounded btn-sm"
-                        onclick="changeStatus('. $new->id .',0 )">Active</span>';
-                    }
-
-                    $input .= '</td>
-            
-           
-         
-                <td>
-                    <a href="'. route('banner.show', $new->id) .'"
-                        class="fa fa-eye">View</a>
-                </td>
-                <td>
-                    <a href="'. route('banner.edit', $new->id) .'"
-                        class="fa fa-edit">Edit</a>
-                </td>
-                <td>
-                    <span>
-                        <form method="POST" action="'. route('banner.destroy', $new->id) .'">
-                            '.csrf_field().'
-                           
-                         '. method_field('delete') .' 
-                            <button type="submit" class="btn btn-outline-danger  ">delete</button>
-                        </form>
-                    </span>
-                </td>';
-                $input .= '</tr>';
-            }
-        } else {
-            $input .= ' <tr> <td colspan="4"> Note : Banners Is Empty ?.</td></tr>';
-        }
-        return $input;
-    }  
+            if($status !="" ){
+                $baneser->where('status', 'LIKE', "%$status%")->get();
+              }
+                  $banner =$baneser->get();
+                  return view('admin.banner.data',compact('banner'));
+    }   
 
         $baneser =BannerModel::Query();
         if($baneserch !="" ){
           $baneser->where('title', 'LIKE', "%$baneserch%")->get();
         }
-              $banner =$baneser->Paginate(5);
+        if($status !="" ){
+            $baneser->where('status', 'LIKE', "%$status%")->get();
+          }
+              $banner =$baneser->get();
               $bann = BannerModel::all();
 
         return view('admin.banner.index',compact('banner','bann'));
@@ -103,7 +64,9 @@ class BannerController extends Controller
         {
             $file= $request->file('bannerImg');
             $filename= time()."_".$file->getClientOriginalName();
-            $file->move('uploads\BannerImg', $filename, 'public');            
+           
+             $file->move(public_path("uploads/BannerImg"), $filename);
+                   
         }
         $data = new BannerModel;
         $data->title = $request->input('title');
@@ -141,17 +104,21 @@ class BannerController extends Controller
             'link' => 'required',
             
         ]);
+      
+        $data = BannerModel::find($id);
         if($request->file('bannerImg'))
         {
             $file= $request->file('bannerImg');
             $filename= time()."_".$file->getClientOriginalName();
-            $file->move('uploads\BannerImg', $filename, 'public');   
+            $file->move(public_path("uploads/BannerImg"), $filename);
+            
+            if (File::exists(public_path("uploads/BannerImg/$data->bannerImg"))) {
+                File::delete(public_path("uploads/BannerImg/$data->bannerImg"));
+            }       
 
         }else{
             $filename = $request->input('image');
-
         }
-        $data = BannerModel::find($id);
         $data->title = $request->input('title');
         // $data->status = $request->input('status');
         $data->description = $request->input('description');
@@ -183,4 +150,27 @@ class BannerController extends Controller
      return response()->json(['success'=>' Status change successfully.']);
 
 }
+
+public function bannerreposition(Request $request)
+{
+       $geeks =$request->geeks;
+                
+            if($geeks)
+            {
+            for($i=0;$i<count($geeks);$i++)
+            {
+            $item = BannerModel::find($geeks[$i]);
+            $item->position = $i;
+            $item->save();
+            }
+            return response()->json(['success'=>true]);
+            }
+            else
+            {
+            return Response::json(array('success' => false));
+            }
+
+}
+
+
 }

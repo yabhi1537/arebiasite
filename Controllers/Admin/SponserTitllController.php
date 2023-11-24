@@ -19,47 +19,9 @@ class SponserTitllController extends Controller
               $baneser->where('title', 'LIKE', "%$namesearch%")->get();
             }
                   $data =$baneser->Paginate(5);
-
-                  $output ='';
-                  if(!$data->isEmpty()){
-                    foreach($data as $new){
-                        $output .='<tr>';
-                        $output .='<td> <img src="'. asset('uploads/sponsortitleimage/'.$new->image) .'"
-                        style="height: 30px;width:30px;"></td>
-                <td>
-                    '. $new->title .'
-                </td>
-                <td>
-                    '. $new->description .'
-                </td>
-                <td>
-                    '. $new->created_at .'
-                </td>
-                <td>
-                    <a href="'. route('sponsortitle.show',$new->id) .'"
-                        class="fa fa-eye">Show</a>
-                </td>
-                <td>
-                    <a href="'. route('sponsortitle.edit',$new->id) .'"
-                        class="fa fa-edit">Edit</a>
-                </td>
-                <td>
-                    <span>
-                        <form method="POST" action="'. route('sponsortitle.destroy',$new->id) .'">
-                        '.csrf_field('delete') .'
-                            '. method_field('delete') .'
-                            <button type="submit" class="btn btn-outline-danger  ">delete</button>
-                        </form>
-                    </span>
-                </td>';
-                $output .= '<tr>';
+                  return view('admin.sponsortitle.data',compact('data'));
+               
             }
-          
-          } else {
-              $output .= ' <tr> <td colspan="4"> Note : Sponsors Title Is Empty ?.</td></tr>';
-          }
-          return $output;
-      }
         $baneser =SponserModel::Query();
         if($namesearch !="" ){
           $baneser->where('title', 'LIKE', "%$namesearch%")->get();
@@ -89,7 +51,8 @@ class SponserTitllController extends Controller
         {
             $file= $request->file('image');
             $filename= time()."_".$file->getClientOriginalName();
-            $file->move('uploads\sponsortitleimage', $filename, 'public');            
+            
+            $file->move(public_path("uploads/sponsortitleimage"), $filename);
         }
         $data = new SponserModel;
         $data->title = $request->input('title');
@@ -128,7 +91,8 @@ class SponserTitllController extends Controller
         {
             $file= $request->file('image');
             $filename= time()."_".$file->getClientOriginalName();
-            $file->move('uploads\sponsortitleimage', $filename, 'public');   
+            
+            $file->move(public_path("uploads/sponsortitleimage"), $filename);
 
         }else{
             $filename = $request->input('images');
@@ -143,7 +107,7 @@ class SponserTitllController extends Controller
 
         $data->save();
 
-        return redirect()->route('sponsortitle.index')->with('message','Sponsortitle Updated Successfully');
+        return redirect()->route('sponsortitle.index')->with('message','Sponsor Header Updated Successfully');
 
     }
 

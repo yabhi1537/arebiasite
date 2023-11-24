@@ -27,64 +27,16 @@ class ContinentController extends Controller
           $datas->where('status', 'LIKE', "%$status%")->get();
         }
   
-              $continet =$datas->Paginate(5);
-               $input = '';
-              if(!$continet->isEmpty()){
-                foreach($continet as $new){
-                  $input .= '<tr>';
-                  $input .= '<td> '. $new->title_ar .' </td>
-                  <td>
-                      '. $new->title .'
-                  </td>
-                  <td class="text-center">';
-                      if($new->status =='0'){
-                      $input .= ' <span id="bookForm" class="btn btn-danger btn-rounded btn-sm"
-                          onclick="changeStatus('. $new->id .',1)">Deactive</span>';
-
-                       } else if($new->status =='1'){
-                      $input .= ' <span id="bookForm" class="btn btn-success btn-rounded btn-sm"
-                          onclick="changeStatus('. $new->id .',0 )">Active</span>';
-                       }
-                       $input .= ' </td>
-                  <td>
-                      <a href="'. route('continet.show',$new->id).'"
-                          class="fa fa-eye">View</a>
-                  </td>
-                  <td>
-                      <a href="'. route('continet.edit',$new->id).'" class="fa fa-edit">Edit</a>
-                  </td>
-                  <td>
-                      <span>
-                          <form method="POST" action="'. route('continet.destroy',$new->id).'">
-                              '.csrf_field().'
-                            '. method_field('delete') .' 
-                              <button type="submit" class="btn btn-outline-danger  ">delete</button>
-                          </form>
-                      </span>
-                  </td>';
-                  $input .= '</tr>';
-                }
-             
-            } else {
-                $input .= ' <tr> <td colspan="4"> Note : Continet Is Empty ?.</td></tr>';
-            }
-            return $input;
+              $continet =$datas->Paginate(10);
+              return view('admin.continet.data',compact('continet'));
         } 
 
 
       $datas =ContinentModel::Query();
-      if($title_ar !="" ){
-        $datas->where('title_ar', 'LIKE', "%$title_ar%")->get();
-      }
-      if($title !="" ){
-        $datas->where('title', 'LIKE', "%$title%")->get();
-      }
-      if($status !="" ){
-        $datas->where('status', 'LIKE', "%$status%")->get();
-      }
    
-            $continet =$datas->Paginate(5);
-            $connet =  ContinentModel::Paginate(5);
+   
+            $continet =$datas->Paginate(10);
+            $connet =  ContinentModel::Paginate(10);
 
        return view('admin.continet.index',compact('continet','connet'));
 

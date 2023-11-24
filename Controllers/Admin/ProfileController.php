@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
 use App\Models\admin\Admin;
 
@@ -49,18 +50,24 @@ class ProfileController extends Controller
         // 'profile' => 'required|image|mimes: jpeg,png,jpg,gif|max:2048',
         ]);
 
+     
+
+        $id = $request->input('adminId');
+        $profile = Admin::find($id);
         if($request->file('profile'))
         {
             $file= $request->file('profile');
             $filename= time()."_".$file->getClientOriginalName();
-            $file->move('uploads\admin\profile', $filename, 'public');            
+            
+             $file->move(public_path("uploads/admin/profile"), $filename);
+            
+            if (File::exists(public_path("uploads/admin/profile/$profile->profile"))) {
+                File::delete(public_path("uploads/admin/profile/$profile->profile"));
+            }     
         } else{
             $filename = $request->input('images');
 
         }
-
-        $id = $request->input('adminId');
-        $profile = Admin::find($id);
         $profile->profile =  $filename;
         $profile->save();
         return redirect()->route('profile.index')->with('message','Profile Updated Successfully');

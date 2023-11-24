@@ -22,61 +22,14 @@ class SociallController extends Controller
               $sociale->where('name','LIKE', "%$nameserch%")->get();
             }
          
-          $social =$sociale->Paginate(5);
-          $output = '';
-            if(!$social->isEmpty()){
-                foreach($social as $new){
-                    $output .= '<tr>';
-                    $output .= '<td>   '. $new->name .'
-                    </td>
-                    <td>
-                        '. $new->links .'
-                    </td>
-                    <td class="text-center">';
-                        if($new->status =='0'){
-                        $output .= '<span id="bookForm" class="btn btn-danger btn-rounded btn-sm"
-                            onclick="changeStatus('. $new->id .',1)">Deactive</span>';
-
-                        }else if($new->status =='1'){
-                            $output .= '<span id="bookForm" class="btn btn-success btn-rounded btn-sm"
-                            onclick="changeStatus('. $new->id .',0 )">Active</span>';
-                          }
-
-                          $output .= '</td>
-
-                    <td>
-                        '. $new->created_at .'
-                    </td>
-
-                    <td>
-                        <a href="'. route('social.edit',$new->id) .'"
-                            class="fa fa-edit">Edit</a>
-                    </td>
-                    <td>
-                        <span>
-                            <form method="POST" action="'. route('social.destroy',$new->id) .'">
-                                '.csrf_field() .'
-                                '. method_field('delete') .'
-                                <button type="submit" class="btn btn-outline-danger  ">delete</button>
-                            </form>
-                        </span>
-                    </td>';
-                    $output .= '<tr>';
-                }
-              
-              } else {
-                  $output .= ' <tr> <td colspan="4"> Note : Social Links  Is Empty ?.</td></tr>';
-              }
-              return $output;
+          $social =$sociale->Paginate(10);
+          return view('admin.sociall.data',compact('social'));
           }
 
           $sociale = SociallModel::query();
-          if($nameserch !=''){
-            $sociale->where('name','LIKE', "%$nameserch%")->get();
-          }
-
+         
         }
-        $social =$sociale->Paginate(5);
+        $social =$sociale->Paginate(10);
          $Allsocial = SociallModel::all();
         return view('admin.sociall.index',compact('social','Allsocial'));
 

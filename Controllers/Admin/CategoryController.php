@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\admin\CategoryModel;
 use App\Models\admin\project_type;
+use Illuminate\Support\Facades\File;
 
 class CategoryController extends Controller
 {
     public function index(Request $request)
-    {
+    { 
+    
       $cateser = $request['cateserch'] ?? "";
       $titlserc = $request['titlserch'] ?? "";
 
@@ -22,65 +24,17 @@ class CategoryController extends Controller
         if($titlserc !="" ){
           $cates->where('title', 'LIKE', "%$titlserc%")->get();
         }
-        $categorys =$cates->Paginate(5);
-
-        $output = '';
-        if(!$categorys->isEmpty()){
-            
-          foreach($categorys as $categor){
-            $output .= '<tr>';
-            $output .= '<td> <img src="'. asset('uploads/category/image/'.$categor->image) .'"
-            style="height: 30px;width:30px;"></td>
-
-           <td> '. $categor->project_type.' </td>
-           <td>'. $categor->title  .' </td>
-           <td>'. $categor->description .'</td>
-    <td class="text-center">';
-        if($categor->status =='0'){
-        $output .= '<span id="bookForm" class="btn btn-danger btn-rounded btn-sm"
-            onclick="changeStatus('. $categor->id.',1)">Deactive</span>';
-
-          } else if($categor->status =='1'){
-        $output .= '<span id="bookForm" class="btn btn-success btn-rounded btn-sm"
-            onclick="changeStatus('. $categor->id .',0 )">Active</span>';
-          }
-
-          $output .= '</td>
-    
-          <td class="d-flex justify-content-center">
-        <a href="'. route('category.show', $categor->id).'"
-            class=""><i class="bi bi-eye-fill f-21" ></i></a>
-
-        <a href="'. route('category.edit', $categor->id).'"
-            class=""><i class="bi bi-pencil-square f-21"></i></a>
-
-        <span>
-            <form method="POST" action="'. route('category.destroy',$categor->id) .'">
-              '.csrf_field().'
-              '. method_field('delete') .'
-              <button type="submit" class="btn-trash"><i class="bi bi-trash f-21"></i></button>
-            </form>
-        </span>
-    </td>';
-    $output .= '</tr>';
-  }
- 
-} else {
-    $output .= ' <tr> <td colspan="4"> Note : Category  Is Empty ?.</td></tr>';
-}
-return $output;
-}
+        $categorys = $cates->with('ProjTypReletion')->Paginate(10);
+        return view('admin.category.data',compact('categorys'));
+       
+      }
 
       $cates =CategoryModel::Query();
-      if($cateser !="" ){
-        $cates->where('project_type', 'LIKE', "%$cateser%")->get();
-      }
-      if($titlserc !="" ){
-        $cates->where('title', 'LIKE', "%$titlserc%")->get();
-      }
-           $categorys = $cates->Paginate(5);
+    
+           $categorys = $cates->with('ProjTypReletion')->Paginate(10);
            $categoryser = CategoryModel::Paginate(5);
-        return view('admin.category.index',compact('categorys','categoryser'));
+           $projectp = project_type::all();
+        return view('admin.category.index',compact('categorys','categoryser','projectp'));
     }
 
     public function create()
@@ -94,7 +48,7 @@ return $output;
       $valData =  $request->validate([
         'project_type' => 'required',
         'title'        => 'required',
-        'status'       => 'required',
+        
         'title_ar' => 'required',
         'description_ar' => 'required',
         'description'  => 'required',
@@ -104,14 +58,16 @@ return $output;
         {
             $file= $request->file('image');
             $filename= time()."_".$file->getClientOriginalName();
-            $file->move('uploads\category\image', $filename, 'public');            
+           
+            
+             $file->move(public_path("uploads/category/image"), $filename);
         }
       $data = new CategoryModel;
 
   
       $data->project_type = $request->input('project_type');
       $data->title = $request->input('title');
-      $data->status = $request->input('status');
+      
       $data->description = $request->input('description');
       $data->title_ar = $request->input('title_ar');
       $data->description_ar = $request->input('description_ar');
@@ -134,27 +90,34 @@ return $output;
       $valData =  $request->validate([
         'project_type' => 'required',
         'title'        => 'required',
-        'status'       => 'required',
         'title_ar' => 'required',
         'description_ar' => 'required',
         'description'  => 'required',
     ]);
     
+      $data = CategoryModel::find($id);
+
+       
     if($request->file('image'))
     {
         $file= $request->file('image');
         $filename= time()."_".$file->getClientOriginalName();
-        $file->move('uploads\category\image', $filename, 'public');            
+      
+        
+        $file->move(public_path("uploads/category/image"), $filename);
+        
+        if (File::exists(public_path("uploads/category/image/$data->image"))) {
+          File::delete(public_path("uploads/category/image/$data->image"));
+      }       
     }else{
 
       $filename = $request->input('images');
 
   }
-      $data = CategoryModel::find($id);
 
       $data->project_type = $request->input('project_type');
       $data->title = $request->input('title');
-      $data->status = $request->input('status');
+      
       $data->description = $request->input('description');
       $data->title_ar = $request->input('title_ar');
       $data->description_ar = $request->input('description_ar');
@@ -170,10 +133,11 @@ return $output;
       return redirect()->route('category.index')->with('message','Category Deleted Successfully');
 
     }
-         public function show($id)
+     public function show($id)
      {
-       $projectId = project_type::all();
+       
        $categores =  CategoryModel::find($id);
+       $projectId = project_type::find($categores->project_type);
       return view('admin.category.show',compact('categores','projectId'));
      }
 

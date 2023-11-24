@@ -17,71 +17,20 @@ class NeedyFamiliesController extends Controller
         if($request->ajax()){
           $datas = NeedyFamiliesModel::Query();
           if($donor_name !="" ){
-            $datas->where('donor_name', 'LIKE', "%$donor_name%")->get();
+            $datas->where('donor_name', 'LIKE', "%$donor_name%")
+            ->orWhere('donor_phone', 'LIKE', "%$donor_name%")
+            ->orWhere('donor_email', 'LIKE', "%$donor_name%")->get();
           }
-          if($donor_phone !="" ){
-            $datas->where('donor_phone', 'LIKE', "%$donor_phone%")->get();
-          }
-          if($donor_email !="" ){
-            $datas->where('donor_email', 'LIKE', "%$donor_email%")->get();
-          }
-                $projectre = $datas->Paginate(5);
-                 $input = '';
-                if(!$projectre->isEmpty()){
-                  foreach($projectre as $new){
-                    $input .= '<tr>';
-                    $input .= '<td> '. $new->donor_name .' </td>
-                    <td>
-                        '. $new->donor_phone .'
-                    </td>
-                            <td>
-                            '. $new->donor_email .'
-                        </td>
-                        <td>
-                        '. $new->family_count .'
-                        </td>
-                    <td>
-                    '. $new->state .'
-                        </td>
-                        <td>
-                        '. $new->city .'
-                            </td>
-                            <td>
-                            '. $new->address .'
-                                </td>
-                        <td class="d-flex justify-content-center">
-                        <a href="'. route('needyfamilies.show',$new->needy_id).'"
-                            class=""><i class="bi bi-eye-fill f-21" ></i></a>
-                
-                        <span>
-                            <form method="POST" action="'. route('needyfamilies.destroy',$new->needy_id).'">
-                                '.csrf_field().'
-                              '. method_field('delete') .' 
-                              <button type="submit" class="btn-trash"><i class="bi bi-trash f-21"></i></button>
-                              </form>
-                        </span>
-                    </td>';
-                    $input .= '</tr>';
-                  }
-               
-              } else {
-                  $input .= ' <tr> <td colspan="4"> Note : Needy Families Is Empty ?.</td></tr>';
-              }
-              return $input;
+
+                $needyfamilies = $datas->Paginate(10);
+                return view('admin.needyfamilies.data',compact('needyfamilies'));
           } 
   
         $datas = NeedyFamiliesModel::Query();
-        if($donor_name !="" ){
-          $datas->where('donor_name', 'LIKE', "%$donor_name%")->get();
-        }
-        if($donor_phone !="" ){
-            $datas->where('donor_phone', 'LIKE', "%$donor_phone%")->get();
-          }
-          if($donor_email !="" ){
-            $datas->where('donor_email', 'LIKE', "%$donor_email%")->get();
-          }
-                $projectre = $datas->Paginate(5);
-                 $needyfamilies = $projectre = NeedyFamiliesModel::Paginate(5);
+       
+       
+           $projectre = $datas->Paginate(10);
+           $needyfamilies = $projectre = NeedyFamiliesModel::Paginate(5);
 
        return view('admin.needyfamilies.index',compact('needyfamilies'));
 

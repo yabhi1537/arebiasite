@@ -17,33 +17,8 @@ class NewsTypController extends Controller
             if($types !="" ){
               $newtyp->where('type', 'LIKE', "%$types%")->get();
             }
-                  $newstype =$newtyp->Paginate(5);
-                  $output = '';
-                  if(!$newstype->isEmpty()){
-                
-                    foreach($newstype as $new)	{
-                      $output .= '<tr>';
-                      $output .= '<td>'.$new->newstypeid .'</td>
-                                  <td> '.$new->type.' </td>
-                                  <td>'.$new->created_at.'</td>
-                                  <td class="d-flex justify-content-center">                        
-                                  <a href="'.route('newstype.show',$new->newstypeid).'" class=""><i class="bi bi-eye-fill f-21" ></i></a>
-                     
-                         <a href="'. route('newstype.edit',$new->newstypeid).'" class=""><i class="bi bi-pencil-square f-21"></i></a>
-              
-                   <span><form method="POST" action="'. route('newstype.destroy',$new->newstypeid).'">
-                   '.csrf_field().'
-                   '.method_field("DELETE").'			    	
-                   <button type="submit" class="btn-trash"><i class="bi bi-trash f-21"></i></button>                                </form>
-                   </form> </span>
-                     </td>';
-                     $output .= '</tr>';
-                    }
-                 
-                } else {
-                    $output .= ' <tr> <td colspan="4"> Note : Project Type Is Empty ?.</td></tr>';
-                }
-                return $output;
+                  $newstype = $newtyp->Paginate(5);
+                  return view('admin.newstype.data',compact('newstype'));
             }
 
            $newtyp =news_type::Query();

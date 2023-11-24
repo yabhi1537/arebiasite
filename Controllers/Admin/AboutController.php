@@ -5,87 +5,45 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\admin\AboutModel;
+use Illuminate\Support\Facades\File; 
 
 class AboutController extends Controller
 {
     public function index(Request $request)
     {
-        $titles = $request['titleserch'] ?? "";
-
-        if($request->ajax()){
-          $achivti =AboutModel::Query();
-          if($titles !="" ){
-            $achivti->where('title', 'LIKE', "%$titles%")->get();
-          }
-                $about =$achivti->Paginate(5);
-                 $input = '';
-                if(!$about->isEmpty()){
-                  foreach($about as $new){
-                  $input .= '<tr>';
-                  $input .= '<td> <img src="'. asset('uploads/about/image/'.$new->image) .'"
-                  style="height: 30px;width:30px;">
-          </td>
-          <td>
-              '. $new->title .'
-          </td>
-          <td>
-              '. $new->description .'
-          </td>
-          <td>
-              '. $new->created_at .'
-          </td>
-          <td>
-              <a href="'. route('about.edit',$new->id) .'"
-                  class="fa fa-edit">Edit</a>
-          </td>
-          $input .= <tr>';
-        }
-      
-      } else {
-          $input .= ' <tr> <td colspan="4"> Note : About Is Empty ?.</td></tr>';
-      }
-      return $input;
-  }
-  
-        $achivti =AboutModel::Query();
-        if($titles !="" ){
-          $achivti->where('title', 'LIKE', "%$titles%")->get();
-        }
-      
-              $about =$achivti->Paginate(5);
-              $Allabout =  AboutModel::Paginate(5);
-
-        return view('admin.about.index',compact('about','Allabout'));
+       $Allabout =  AboutModel::Paginate(5);
+        return view('admin.about.index',compact('Allabout'));
     }
-    public function create()
-    {
-      return view('admin.about.create');
-    }
+    
+  //   public function create()
+  //   {
+  //     return view('admin.about.create');
+  //   }
 
-    public function store(Request $request)
-   {
-     $valData =  $request->validate([
-       'title' => 'required',
-       'description' => 'required',
-       'image' => 'required',
+  //   public function store(Request $request)
+  //  {
+  //    $valData =  $request->validate([
+  //      'title' => 'required',
+  //      'description' => 'required',
+  //      'image' => 'required',
        
-   ]);
-   if($request->file('image'))
-   {
-       $file= $request->file('image');
-       $filename= time()."_".$file->getClientOriginalName();
-       $file->move('uploads\about\image', $filename, 'public');            
-   } 
+  //  ]);
+  //  if($request->file('image'))
+  //  {
+  //      $file= $request->file('image');
+  //      $filename= time()."_".$file->getClientOriginalName();
+  //      $file->move('uploads\about\image', $filename, 'public');            
+  //  } 
 
 
-     $data = new AboutModel;
+  //    $data = new AboutModel;
 
-     $data->title = $request->input('title');
-     $data->description = $request->input('description');
-     $data->image =  $filename;
-     $data->save();
-     return redirect()->route('about.index')->with('message','About Add Successfully');
-   }
+  //    $data->title = $request->input('title');
+  //    $data->description = $request->input('description');
+  //    $data->image =  $filename;
+  //    $data->save();
+  //    return redirect()->route('about.index')->with('message','About Add Successfully');
+  //  }
 
    public function edit($id)
    {
@@ -96,6 +54,13 @@ class AboutController extends Controller
    public function update(Request $request,$id)
    {
     $valData =  $request->validate([
+        'title_ar' => 'required',
+        'description_ar' => 'required',
+        'titles_ar' => 'required',
+        'vision_ar' => 'required',
+        'mission_ar' => 'required',
+        'obj_title_ar' => 'required',
+        'obj_description_ar' => 'required',
         'title' => 'required',
         'description' => 'required',
         'titles' => 'required',
@@ -105,28 +70,45 @@ class AboutController extends Controller
         'obj_description' => 'required',
         
     ]);
+    
+    
+ 
+      $data = AboutModel::find($id);
+      
     if($request->file('image'))
     {
         $file= $request->file('image');
         $filename= time()."_".$file->getClientOriginalName();
-        $file->move('uploads\about\image', $filename, 'public');            
+       
+        $file->move(public_path("uploads/about/image"), $filename);
+
+        if (File::exists(public_path("uploads/about/image/$data->image"))) {
+          File::delete(public_path("uploads/about/image/$data->image"));
+      }
     } else{
 
         $filename = $request->input('images');
     }
-    
     if($request->file('photo'))
     {
         $file= $request->file('photo');
         $filenames= time()."_".$file->getClientOriginalName();
-        $file->move('uploads\visionmission\photo', $filenames, 'public');            
+        
+        $file->move(public_path("uploads/visionmission/photo"), $filename);
+        
+        if (File::exists(public_path("uploads/visionmission/photo/$data->photo"))) {
+          File::delete(public_path("uploads/visionmission/photo/$data->photo"));
+      }
     } else{
-
         $filenames = $request->input('photos');
     }
- 
-      $data = AboutModel::find($id);
- 
+      $data->title_ar = $request->input('title_ar');
+      $data->description_ar = $request->input('description_ar');
+      $data->titles_ar = $request->input('titles_ar');
+      $data->vision_ar = $request->input('vision_ar');
+      $data->mission_ar = $request->input('mission_ar');
+      $data->obj_title_ar = $request->input('obj_title_ar');
+      $data->obj_description_ar = $request->input('obj_description_ar');
       $data->title = $request->input('title');
       $data->description = $request->input('description');
       $data->titles = $request->input('titles');
@@ -146,5 +128,10 @@ class AboutController extends Controller
      $data->delete();
      return redirect()->route('about.index')->with('message','About Deleted Successfully');
 
+   }
+   public function show($id)
+   {
+     $abotshow =  AboutModel::find($id);
+     return view('admin.about.show',compact('abotshow'));
    }
 }

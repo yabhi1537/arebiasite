@@ -12,107 +12,25 @@ class UserController extends Controller
     {
       
       $username =   $request['username'] ?? "";
-      $useremai =   $request['useremail'] ?? "";
-      $userphon =   $request['userphone'] ?? "";
 
       if($request->ajax()){
         $user=UserModel::Query();
         if($username !="" ){
          
-          $user->where('full_name', 'LIKE', "%$username%")->get();
+          $user->where('full_name', 'LIKE', "%$username%")
+          ->orWhere('email', '=', "$username")
+         ->orWhere('phone', '=', "$username")->get();
         }
-        if ($useremai !="" ) {
-        
-          $user->where('email', '=', "$useremai")->get();
-        }
-        if ($userphon !="" ) {
-        
-          $user->where('phone', '=', "$userphon")->get();
-        }
-  
-              $userss =$user->Paginate(5);
-                 $input = '';
-              if(!$userss->isEmpty()){
-             
-                foreach($userss as $usr){
-                  $input .= '<tr>';
-                $input .= '<td>
-                '. $usr->user_id .'
-            </td>
-            <td>
-                '. $usr->	full_name .'
-            </td>
-            <td>
-                '. $usr->	email .'
-            </td>
-            <td>
-                '. $usr->	phone .'
-            </td>
-            <td>
-            '. $usr->	created_at .'
-          </td>
-            <td>';
-                if ($usr->newsletter == 1){
-                $input .= '<span style="color: green;">Yes</span>';
-                 } else{
-                $input .= '<span style="color: red;">No</span>';
-                }
-                $input .= '</td>
-            <td class="text-center">';
-                if($usr->status =='0'){
-                $input .= '<span id="bookForm" class="btn btn-danger btn-rounded btn-sm"
-                    onclick="changeStatus('. $usr->user_id .',1)">Deactive</span>';
-
-                }else{
-                if($usr->status =='1')
-                $input .= '<span id="bookForm" class="btn btn-success btn-rounded btn-sm"
-                    onclick="changeStatus('. $usr->user_id .',0 )">Active</span>';
-                }
-
-                $input .= '</td>
-          
-            <td>
-                <a href="'. route('user.show',$usr->user_id).'"
-                    class="fa fa-eye">View</a>
-            </td>
-            <td>
-                <a href="'. route('user.edit',$usr->user_id).'"
-                    class="fa fa-edit">Edit</a>
-            </td>
-            <td>
-                <span>
-                    <form method="POST" action="'. route('user.destroy',$usr->user_id).'">
-                        '. csrf_field().'
-                       '. method_field('delete') .'
-                        <button type="submit" class="btn btn-outline-danger  ">delete</button>
-                    </form>
-                </span>
-            </td>';
-            $input .= '</tr>';
-          }
-       
-      } else {
-          $input .= ' <tr> <td colspan="4"> Note : Users Is Empty ?.</td></tr>';
-      }
-      return $input;
+              $userss =$user->Paginate(10);
+              return view('admin.user.data',['userss'=>$userss]);
   }  
 
 
       $user=UserModel::Query();
-      if($username !="" ){
-       
-        $user->where('full_name', 'LIKE', "%$username%")->get();
-      }
-      if ($useremai !="" ) {
-      
-        $user->where('email', '=', "$useremai")->get();
-      }
-      if ($userphon !="" ) {
-      
-        $user->where('phone', '=', "$userphon")->get();
-      }
-            $userss =$user->Paginate(5);
-             $userserch =  UserModel::Paginate(5);
+  
+     
+            $userss =$user->Paginate(10);
+             $userserch =  UserModel::Paginate(10);
         return view('admin.user.index',['userss'=>$userss,'userserch'=>$userserch]);
 
     }
@@ -149,14 +67,14 @@ class UserController extends Controller
         'full_name' => 'required',
         'phone' => 'required',
         'newsletter' => 'required',
-        'status' => 'required',
+        
     ]);
      $data = UserModel::find($id);
 
      $data->full_name = $request->input('full_name');
      $data->phone = $request->input('phone');
      $data->newsletter = $request->input('newsletter');
-     $data->status = $request->input('status');
+    
      $data->save();
      return redirect()->route('user.index')->with('message','User Updated Successfully');
    }

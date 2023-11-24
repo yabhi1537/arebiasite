@@ -12,70 +12,29 @@ class CountryController extends Controller
     
     public function index(Request $request)
     {
-        $title_ar = $request['title_ar'] ?? "";
+       
         $title = $request['title'] ?? "";
         $country = $request['country'] ?? "";
   
         if($request->ajax()){
           $datas =CountryModel::Query();
-          if($title_ar !="" ){
-            $datas->where('title_ar', 'LIKE', "%$title_ar%")->get();
-          }
           if($title !="" ){
             $datas->where('title', 'LIKE', "%$title%")->get();
           }
           if($country !="" ){
             $datas->where('country', 'LIKE', "%$country%")->get();
           }
-                $country =$datas->Paginate(5);
-                 $input = '';
-                if(!$country->isEmpty()){
-                  foreach($country as $new){
-                    $input .= '<tr>';
-                    $input .= '<td> '. $new->title .' </td>
-                    <td>
-                    '. $new->country .'
-                    </td>
-                    <td>
-                        <a href="'. route('country.show',$new->id).'"
-                            class="fa fa-eye">View</a>
-                    </td>
-                    <td>
-                        <a href="'. route('country.edit',$new->id).'" class="fa fa-edit">Edit</a>
-                    </td>
-                    <td>
-                        <span>
-                            <form method="POST" action="'. route('country.destroy',$new->id).'">
-                                '.csrf_field().'
-                              '. method_field('delete') .' 
-                                <button type="submit" class="btn btn-outline-danger  ">delete</button>
-                            </form>
-                        </span>
-                    </td>';
-                    $input .= '</tr>';
-                  }
+                $country =$datas->Paginate(10);
+                return view('admin.country.data',compact('country'));
                
-              } else {
-                  $input .= ' <tr> <td colspan="4"> Note : country Is Empty ?.</td></tr>';
-              }
-              return $input;
           } 
   
   
         $datas =CountryModel::Query();
-        if($title_ar !="" ){
-          $datas->where('title_ar', 'LIKE', "%$title_ar%")->get();
-        }
-        if($title !="" ){
-          $datas->where('title', 'LIKE', "%$title%")->get();
-        }
-        if($country !="" ){
-          $datas->where('country', 'LIKE', "%$country%")->get();
-        }
+      
      
-              $country =$datas->Paginate(5);
-              $count =  CountryModel::Paginate(5);
- 
+              $country =$datas->Paginate(10);
+              $count =  CountryModel::all();
        return view('admin.country.index',compact('country','count'));
     }
 

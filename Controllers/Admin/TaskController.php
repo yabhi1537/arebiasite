@@ -19,7 +19,7 @@ class TaskController extends Controller
       if($request->ajax()){
         $datas =TaskModel::Query();
         if($taskserch !="" ){
-          $datas->where('task_for', 'LIKE', "%$taskserch%")->get();
+          $datas->where('task_for', '=', "$taskserch")->get();
         }
         if($nameserch !="" ){
           $datas->where('task', 'LIKE', "%$nameserch%")->get();
@@ -28,76 +28,17 @@ class TaskController extends Controller
           $datas->where('status', 'LIKE', "%$status%")->get();
         }
         if($datesearch !="" ){
-          $datas->where('created_at', 'LIKE', "%$datesearch%")->get();
+          $datas->whereDate('created_at', '=', $datesearch)->get();
         }
-              $task =$datas->Paginate(5);
-               $input = '';
-              if(!$task->isEmpty()){
-                foreach($task as $new){
-                  $input .= '<tr>';
-                  $input .= '<td> '. $new->task_for .' </td>
-                  <td>
-                      '. $new->task .'
-                  </td>
-                  <td>
-                  '. $new->description .'
-              </td>
-              <td>
-                  '. $new->created_at .'
-              </td>
-                  <td class="text-center">';
-                      if($new->status =='0'){
-                      $input .= ' <span id="bookForm" class="btn btn-danger btn-rounded btn-sm"
-                          onclick="changeStatus('. $new->id .',1)">Deactive</span>';
-
-                       } else if($new->status =='1'){
-                      $input .= ' <span id="bookForm" class="btn btn-success btn-rounded btn-sm"
-                          onclick="changeStatus('. $new->id .',0 )">Active</span>';
-                       }
-
-                       $input .= ' </td>
-                
-                  <td>
-                      <a href="'. route('task.show',$new->id).'"
-                          class="fa fa-eye">View</a>
-                  </td>
-                  <td>
-                      <a href="'. route('task.edit',$new->id).'" class="fa fa-edit">Edit</a>
-                  </td>
-                  <td>
-                      <span>
-                          <form method="POST" action="'. route('task.destroy',$new->id).'">
-                              '.csrf_field().'
-                            '. method_field('delete') .' 
-                              <button type="submit" class="btn btn-outline-danger  ">delete</button>
-                          </form>
-                      </span>
-                  </td>';
-                  $input .= '</tr>';
-                }
-             
-            } else {
-                $input .= ' <tr> <td colspan="4"> Note : Task Is Empty ?.</td></tr>';
-            }
-            return $input;
+              $task =$datas->Paginate(10);
+         return view('admin.task.data',compact('task'));
+              
         } 
 
-
       $datas =TaskModel::Query();
-      if($taskserch !="" ){
-        $datas->where('task_for', 'LIKE', "%$taskserch%")->get();
-      }
-      if($nameserch !="" ){
-        $datas->where('task', 'LIKE', "%$nameserch%")->get();
-      }
-      if($status !="" ){
-        $datas->where('status', 'LIKE', "%$status%")->get();
-      }
-      if($datesearch !="" ){
-        $datas->where('created_at', 'LIKE', "%$datesearch%")->get();
-      }
-            $task =$datas->Paginate(5);
-            $alltask =  TaskModel::Paginate(5);
+    
+            $task =$datas->Paginate(10);
+            $alltask =  TaskModel::Paginate(10);
 
        return view('admin.task.index',compact('task','alltask'));
 
@@ -116,7 +57,7 @@ class TaskController extends Controller
         'task_ar'         => 'required',
         'description_ar'         => 'required',
         'description'  => 'required',
-        'status'       => 'required',
+        
     ]);
 
      $data = new TaskModel;
@@ -126,7 +67,7 @@ class TaskController extends Controller
      $data->description = $request->input('description');
      $data->task_ar = $request->input('task_ar');
      $data->description_ar = $request->input('description_ar');
-     $data->status = $request->input('status');
+    
      $data->save();
      return redirect()->route('task.index')->with('message','Task Add Successfully');
    }
@@ -151,7 +92,7 @@ class TaskController extends Controller
         'task_ar'         => 'required',
         'description_ar'         => 'required',
         'description'  => 'required',
-        'status'       => 'required',
+       
     ]);
 
      $data = TaskModel::find($id);
@@ -161,7 +102,7 @@ class TaskController extends Controller
      $data->description = $request->input('description');
      $data->task_ar = $request->input('task_ar');
      $data->description_ar = $request->input('description_ar');
-     $data->status = $request->input('status');
+    
      $data->save();
      return redirect()->route('task.index')->with('message','Task Updated Successfully');
    }

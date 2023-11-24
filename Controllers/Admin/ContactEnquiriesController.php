@@ -13,77 +13,25 @@ class ContactEnquiriesController extends Controller
     public function index(Request $request)
     {
         $nameserch = $request['nameserch'] ?? "";
-        $emailserch = $request['emailserch'] ?? "";
-        $phone = $request['phone'] ?? "";
-
         if($request->ajax()){
           $achivti =ContactEnquiriesModel::Query();
 
           if($nameserch !="" ){
-            $achivti->where('name', 'LIKE', "%$nameserch%")->get();
+            $achivti->where('name', 'LIKE', "%$nameserch%")
+            ->orWhere('email', 'LIKE', "%$nameserch%")
+            ->orWhere('phone', 'LIKE', "%$nameserch%")->get();
           }
-          if($emailserch !="" ){
-              $achivti->where('email', 'LIKE', "%$emailserch%")->get();
-            }
-            if($phone !="" ){
-              $achivti->where('phone', 'LIKE', "%$phone%")->get();
-            }
-        
-                $contactquery =$achivti->Paginate(5);
-                $output = '';
-                if(!$contactquery->isEmpty()){
-                  foreach($contactquery as $new){
-                    $output .= '<tr>';
-                    $output .= '<td>  <div>
-                    <input type="checkbox" data-name="'.$new->name.'" data-email="'.$new->email.'"
-                        name="checkboxlist[]" value="'.$new->id.'" class="one_checked checkbox form-check-input m-0"
-                        style="position: relative;">
-                </div>
-
-            </td>
-            <td>
-                '. $new->name .'
-            </td>
-            <td>
-                '. $new->phone .'
-            </td>
-            <td>
-                '. $new->email .'
-            </td>
-            <td>
-                '. $new->quiries .'
-            </td>
-            <td>
-                '. $new->date .'
-            </td>
-
-            <td>
-                <a href="'. route('contactquery.edit',$new->id).'" class="fa fa-edit">Edit</a>
-            </td>';
-
-            $output .= '<tr>';
-          }
-        
-        } else {
-            $output .= ' <tr> <td colspan="4"> Note : Contacts Is Empty ?.</td></tr>';
-        }
-        return $output;
+                $contactquery =$achivti->Paginate(10);
+           return view('admin.contactquery.data',compact('contactquery'));
+               
     }
 
         $achivti =ContactEnquiriesModel::Query();
 
-        if($nameserch !="" ){
-          $achivti->where('name', 'LIKE', "%$nameserch%")->get();
-        }
-        if($emailserch !="" ){
-            $achivti->where('email', 'LIKE', "%$emailserch%")->get();
-          }
-          if($phone !="" ){
-            $achivti->where('phone', 'LIKE', "%$phone%")->get();
-          }
-      
-              $contactquery =$achivti->Paginate(5);
-              $Allabout =  ContactEnquiriesModel::Paginate(5);
+    
+ 
+              $contactquery =$achivti->Paginate(10);
+              $Allabout =  ContactEnquiriesModel::Paginate(10);
 
         return view('admin.contactquery.index',compact('contactquery','Allabout'));
     }
@@ -142,25 +90,29 @@ class ContactEnquiriesController extends Controller
 
   //  emal Send?
   
-  // public function mailsend(Request $request){
-    // dd($request->all());
-    // return $request['name'];
-    //  $input = $request->all();
-    // ContactEnquiriesModel::create($input); 
-    // Mail::send('admin.email', [
-    //         'name' => $request['name'],
-    //         'email' => $request['email'],
-    //         'description' => $request['description']
-       
-    //         ],
-           
-    //         function ($message) { 
-    //                 $message->from('yabhi1537@gmail.com');
-    //                 $message->to('yabhi1537@gmail.com', 'TECH COM')
-    //                 ->subject('Your Website Contact Form one ');
-    // });
-    // return back()->with('success', 'Thanks for contacting me, I will get back to you soon!');
-// }
+   public function mailsend(Request $request){
+     
+      $name=explode(',',$request['name']);
+      $email=explode(',',$request['email']);
+      
+     for($i=0;$i<count($name);$i++)
+     {
+		         $emailval=$email[$i];
+				 Mail::send('admin.email', [
+						 'name' => $name[$i],
+						 'email' => $email[$i],
+						 'description' => $request['description']
+				   
+						 ],
+					   
+						 function ($message) use($emailval) { 
+							
+								 $message->to($emailval)
+								 ->subject('Replay contact inquiery ');
+				 });
+	  }
+     return back()->with('message', 'contact mail sent successfully!');
+ }
 
 
 }

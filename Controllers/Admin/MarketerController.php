@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\admin\MarketerModel;
+use App\Models\admin\CountryModel;
+use App\Models\admin\marketerlinksModel;
 
 
 class MarketerController extends Controller
@@ -20,10 +22,8 @@ class MarketerController extends Controller
        if($request->ajax()){
         $datas =MarketerModel::Query();
         if($nameserch !="" ){
-          $datas->where('name', 'LIKE', "%$nameserch%")->get();
-        }
-        if($emailserch !="" ){
-          $datas->where('email', 'LIKE', "%$emailserch%")->get();
+          $datas->where('name', 'LIKE', "%$nameserch%")
+          ->orWhere('email', 'LIKE', "%$nameserch%")->get();
         }
         if($countryserch !="" ){
           $datas->where('country', 'LIKE', "%$countryserch%")->get();
@@ -31,72 +31,25 @@ class MarketerController extends Controller
         if($datesearch !="" ){
           $datas->where('join_date', 'LIKE', "%$datesearch%")->get();
         }
-              $marketer =$datas->Paginate(5);
-             $input = '';
-              if(!$marketer->isEmpty()){
-             
-                foreach($marketer as $new){
-                  $input .= '<tr>';
-                  $input .= '<td>  '. $new->name .'
-                  </td>
-                  <td>
-                      '. $new->email .'
-                  </td>
-                  <td>
-                      '. $new->country .'
-                  </td>
-                  <td>
-                      '. $new->join_date .'
-                  </td>
-                  <td>
-                      <a href="'. route('marketer.show',$new->id).'"
-                          class="fa fa-eye">View</a>
-                  </td>
-                  <td>
-                      <a href="'. route('marketer.edit',$new->id).'"
-                          class="fa fa-edit">Edit</a>
-                  </td>
-                  <td>
-                      <span>
-                          <form method="POST" action="'. route('marketer.destroy',$new->id).'">
-                              '.csrf_field().'
-                             '. method_field('delete') .'
-                              <button type="submit" class="btn btn-outline-danger  ">delete</button>
-                          </form>
-                      </span>
-                  </td>';
-                  $input .= '</tr>';
-                }
-              
-            } else {
-                $input .= ' <tr> <td colspan="4"> Note : Marketers Is Empty ?.</td></tr>';
-            }
-            return $input;
+              $marketer =$datas->Paginate(10);
+              return view('admin.marketer.data',compact('marketer'));
+         
         } 
 
       $datas =MarketerModel::Query();
-      if($nameserch !="" ){
-        $datas->where('name', 'LIKE', "%$nameserch%")->get();
-      }
-      if($emailserch !="" ){
-        $datas->where('email', 'LIKE', "%$emailserch%")->get();
-      }
-      if($countryserch !="" ){
-        $datas->where('country', 'LIKE', "%$countryserch%")->get();
-      }
-      if($datesearch !="" ){
-        $datas->where('join_date', 'LIKE', "%$datesearch%")->get();
-      }
-            $marketer =$datas->Paginate(5);
-            $allmerket =  MarketerModel::Paginate(5);
+     
+            $marketer =$datas->Paginate(10);
+            $allmerket =  MarketerModel::Paginate(10);
+            $countries =  CountryModel::all();
 
-       return view('admin.marketer.index',compact('marketer','allmerket'));
+       return view('admin.marketer.index',compact('marketer','allmerket','countries'));
 
     }
 
    public function create()
    {
-     return view('admin.marketer.create');
+	  $countries =  CountryModel::all();  
+     return view('admin.marketer.create',compact('countries'));
    }
 
    public function store(Request $request)
@@ -119,15 +72,17 @@ class MarketerController extends Controller
    }
 
    public function show($id)
-   {
+   { 
      $marketer =  MarketerModel::find($id);
-     return view('admin.marketer.show',compact('marketer'));
+     $link = marketerlinksModel::where('marketer', $id)->get();
+     return view('admin.marketer.show',compact('marketer','link'));
    }
  
    public function edit($id)
    {
+	 $countries =  CountryModel::all();    
      $marketer =  MarketerModel::find($id);
-     return view('admin.marketer.edit',compact('marketer'));
+     return view('admin.marketer.edit',compact('marketer','countries'));
    }
 
    public function update(Request $request,$id)

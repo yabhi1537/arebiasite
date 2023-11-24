@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\admin\ConteactModel;
+use Illuminate\Support\Facades\File;
 
 class ConteactController extends Controller
 {
@@ -33,7 +34,7 @@ class ConteactController extends Controller
 
           }
           $data = $datas->paginate(5);
-       $Alldata = ConteactModel::all();
+          $Alldata = ConteactModel::all();
 
        return view('admin.contactdetails.index',compact('data','Alldata'));
     }
@@ -43,45 +44,45 @@ class ConteactController extends Controller
         return view('admin.contactdetails.create');
     }
 
-    public function store(Request $request)
-    {
-        $valData =  $request->validate([
+    // public function store(Request $request)
+    // {
+    //     $valData =  $request->validate([
 
-            'address_ar' => 'required',
-            'city_ar' => 'required',
-            'country_ar' => 'required',
-            'email' => 'required',
-            'phone' => 'required',
-            'address' => 'required',
-            'city' => 'required',
-            'country' => 'required',
-            'pincode' => 'required',
-            'logo' => 'required',
+    //         'address_ar' => 'required',
+    //         'city_ar' => 'required',
+    //         'country_ar' => 'required',
+    //         'email' => 'required',
+    //         'phone' => 'required',
+    //         'address' => 'required',
+    //         'city' => 'required',
+    //         'country' => 'required',
+    //         'pincode' => 'required',
+    //         'logo' => 'required',
 
-        ]);  
+    //     ]);  
 
-        if($request->file('logo'))
-        {
-            $file= $request->file('logo');
-            $filename= time()."_".$file->getClientOriginalName();
+    //     if($request->file('logo'))
+    //     {
+    //         $file= $request->file('logo');
+    //         $filename= time()."_".$file->getClientOriginalName();
  
-            $file->move('uploads\contact\logo', $filename, 'public');            
-        }
+    //         $file->move('uploads\contact\logo', $filename, 'public');            
+    //     }
           
-        $data = new ConteactModel;
-        $data->address_ar = $request->input('address_ar');
-        $data->city_ar = $request->input('city_ar');
-        $data->country_ar = $request->input('country_ar');
-        $data->email = $request->input('email');
-        $data->phone = $request->input('phone');
-        $data->address = $request->input('address');
-        $data->city = $request->input('city');
-        $data->country = $request->input('country');
-        $data->pincode = $request->input('pincode');
-        $data->logo = $filename;
-        $data->save();
-        return redirect()->route('contect.index')->with('message','Contect Add Successfully');
-    }
+    //     $data = new ConteactModel;
+    //     $data->address_ar = $request->input('address_ar');
+    //     $data->city_ar = $request->input('city_ar');
+    //     $data->country_ar = $request->input('country_ar');
+    //     $data->email = $request->input('email');
+    //     $data->phone = $request->input('phone');
+    //     $data->address = $request->input('address');
+    //     $data->city = $request->input('city');
+    //     $data->country = $request->input('country');
+    //     $data->pincode = $request->input('pincode');
+    //     $data->logo = $filename;
+    //     $data->save();
+    //     return redirect()->route('contect.index')->with('message','Contect Add Successfully');
+    // }
 
     public function show($id)
     {
@@ -110,19 +111,28 @@ class ConteactController extends Controller
             'city' => 'required',
             'country' => 'required',
             'pincode' => 'required',
+            'description' => 'required',
+            'description_ar' => 'required',
         ]);
+       
+        $data = ConteactModel::find($id);
+
         if($request->file('logo'))
         {
             $file= $request->file('logo');
             $filename= time()."_".$file->getClientOriginalName();
  
-            $file->move('uploads\contact\logo', $filename, 'public');            
+            
+            $file->move(public_path("uploads/contact/logo"), $filename);
+            
+            if (File::exists(public_path("uploads/contact/logo/$data->logo"))) {
+                File::delete(public_path("uploads/contact/logo/$data->logo"));
+            }   
         }else{
             $filename = $request->input('logos');
 
         }
           
-        $data = ConteactModel::find($id);
         $data->address_ar = $request->input('address_ar');
         $data->city_ar = $request->input('city_ar');
         $data->country_ar = $request->input('country_ar');
@@ -132,6 +142,8 @@ class ConteactController extends Controller
         $data->city = $request->input('city');
         $data->country = $request->input('country');
         $data->pincode = $request->input('pincode');
+        $data->description = $request->input('description');
+        $data->description_ar = $request->input('description_ar');
         $data->logo = $filename;
         $data->save();
         return redirect()->route('contect.index')->with('message','Contect Updated Successfully');

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\admin\AchivementModel;
+use Illuminate\Support\Facades\File; 
+
 
 class AchivementController extends Controller
 {
@@ -16,68 +18,22 @@ class AchivementController extends Controller
 
       if($request->ajax()){
         $achivti =AchivementModel::Query();
-        if($achivserch !="" ){
-          $achivti->where('achivement_type', 'LIKE', "%$achivserch%")->get();
-        }
+        // if($achivserch !="" ){
+        //   $achivti->where('achivement_type', 'LIKE', "%$achivserch%")->get();
+        // }
         if($achivtitle !="" ){
-          $achivti->where('title', 'LIKE', "%$achivtitle%")->get();
+          $achivti->where('title', 'LIKE', "%$achivtitle%")
+          ->orWhere('achivement_type', 'LIKE', "%$achivtitle%")->get();
         }
-              $achivement =$achivti->Paginate(5);
-                  $input = '';
-              if(!$achivement->isEmpty()){
-                foreach($achivement as $new){
-                  $input .= '<tr>';
-                  $input .= '<td>
-                  <img src="'. asset('uploads/achivement/images/'.$new->images) .'"
-                  style="height: 30px;width:30px;">
-          </td>
-          <td>
-              '. $new->achivement_type .'
-          </td>
-          <td>
-              '. $new->title .'
-          </td>
-          <td>
-              '. $new->description .'
-          </td>
-          <td>
-              '. $new->created_at .'
-          </td>
-          <td>
-              <a href="'. route('achivement.show',$new->id).'"
-                  class="fa fa-eye">View</a>
-          </td>
-          <td>
-              <a href="'. route('achivement.edit',$new->id).'"
-                  class="fa fa-edit">Edit</a>
-          </td>
-          <td>
-              <span>
-                  <form method="POST" action="'. route('achivement.destroy',$new->id).'">
-                      '.csrf_field() .'
-                      '. method_field('delete') .'
-                      <button type="submit" class="btn btn-outline-danger  ">delete</button>
-                  </form>
-              </span>
-          </td>';
-          $input .= '</tr>';
-        }
-      
-    } else {
-        $input .= ' <tr> <td colspan="4"> Note : Achivments Is Empty ?.</td></tr>';
-    }
-    return $input;
+              $achivement =$achivti->Paginate(10);
+              return view('admin.achivement.data',compact('achivement'));
+              
 }
 
       $achivti =AchivementModel::Query();
-      if($achivserch !="" ){
-        $achivti->where('achivement_type', 'LIKE', "%$achivserch%")->get();
-      }
-      if($achivtitle !="" ){
-        $achivti->where('title', 'LIKE', "%$achivtitle%")->get();
-      }
-            $achivement =$achivti->Paginate(5);
-            $achivem =  AchivementModel::Paginate(5);
+      
+            $achivement =$achivti->Paginate(10);
+            $achivem =  AchivementModel::Paginate(10);
 
        return view('admin.achivement.index',compact('achivement','achivem'));
 
@@ -103,7 +59,8 @@ class AchivementController extends Controller
    {
        $file= $request->file('images');
        $filename= time()."_".$file->getClientOriginalName();
-       $file->move('uploads\achivement\images', $filename, 'public');            
+       
+       $file->move(public_path("uploads/achivement/images"), $filename);
    } 
 
 
@@ -142,17 +99,23 @@ class AchivementController extends Controller
        
    ]);
 
+     $data = AchivementModel::find($id);
+
+     
    if($request->file('images'))
    {
        $file= $request->file('images');
        $filename= time()."_".$file->getClientOriginalName();
-       $file->move('uploads\achivement\images', $filename, 'public');            
+      
+       $file->move(public_path("uploads/achivement/images"), $filename);
+
+       if (File::exists(public_path("uploads/achivement/images/$data->images"))) {
+        File::delete(public_path("uploads/achivement/images/$data->images"));   
+       }         
    } else{
 
      $filename = $request->input('image');
-
  }
-     $data = AchivementModel::find($id);
 
      $data->achivement_type = $request->input('achivement_type');
      $data->title = $request->input('title');

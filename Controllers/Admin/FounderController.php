@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\admin\FounderModel;
+use Illuminate\Support\Facades\File;
 
 class FounderController extends Controller
 {
@@ -22,59 +23,17 @@ class FounderController extends Controller
             $datas->where('name','LIKE', "%$nameserch%")->get();
           }
           if($desicserch !="" ){
-            $datas->where('designation', 'LIKE', "%$desicserch%")->get();
+            $datas->where('designation', '=', "$desicserch")->get();
           }
-          $founder =$datas->Paginate(5);
-                 $output ='';
-          if(!$founder->isEmpty()){
-          foreach($founder as $new){
-            $output .='<tr>';
-            $output .='<td> <img src="'. asset('uploads/founder/image/'.$new->image) .'"
-            style="height: 30px;width:30px;">
-    </td>
-    <td>
-        '. $new->name .'
-    </td>
-    <td>
-        '. $new->designation .'
-    </td>
-    <td>
-        '. $new->created_at .'
-    </td>
-    <td>
-        <a href="'. route('founder.show',$new->id).'"
-            class="fa fa-eye">View</a>
-    </td>
-    <td>
-        <a href="'. route('founder.edit',$new->id).'"
-            class="fa fa-edit">Edit</a>
-    </td>
-    <td>
-        <span>
-            <form method="POST" action="'. route('founder.destroy',$new->id).'">
-            '.csrf_field('delete') .'
-               '. method_field('delete') .' 
-                <button type="submit" class="btn btn-outline-danger  ">delete</button>
-            </form>
-        </span>
-      </td>';
-    $output .='<tr>';
-  }
-  } else {
-      $output .= ' <tr> <td colspan="4"> Note : Achivments Is Empty ?.</td></tr>';
-  }
-  return $output;
+          $founder =$datas->Paginate(10);
+          return view('admin.founder.data',compact('founder'));
+         
   }
        
       $datas =FounderModel::Query();
-      if($nameserch !="" ){
-        $datas->where('name', 'LIKE', "%$nameserch%")->get();
-      }
-      if($desicserch !="" ){
-        $datas->where('designation', 'LIKE', "%$desicserch%")->get();
-      }
-            $founder =$datas->Paginate(5);
-            $allfounder =  FounderModel::Paginate(5);
+      
+            $founder =$datas->Paginate(10);
+            $allfounder =  FounderModel::Paginate(10);
 
        return view('admin.founder.index',compact('founder','allfounder'));
 
@@ -100,7 +59,8 @@ class FounderController extends Controller
    {
        $file= $request->file('image');
        $filename= time()."_".$file->getClientOriginalName();
-       $file->move('uploads\founder\image', $filename, 'public');            
+      
+         $file->move(public_path("uploads/founder/image"), $filename);
    } 
 
      $data = new FounderModel;
@@ -139,17 +99,24 @@ class FounderController extends Controller
         
     ]);
 
-   if($request->file('image'))
-   {
-       $file= $request->file('image');
-       $filename= time()."_".$file->getClientOriginalName();
-       $file->move('uploads\founder\image', $filename, 'public');            
-   } else{
-
-     $filename = $request->input('images');
-
- }
+  
      $data = FounderModel::find($id);
+
+     if($request->file('image'))
+     {
+         $file= $request->file('image');
+         $filename= time()."_".$file->getClientOriginalName();
+        
+         $file->move(public_path("uploads/founder/image"), $filename);
+  
+         if (File::exists(public_path("uploads/founder/image/$data->image"))) {
+          File::delete(public_path("uploads/founder/image/$data->image"));
+      }            
+     } else{
+  
+       $filename = $request->input('images');
+  
+   }
 
      $data->name = $request->input('name');
      $data->designation = $request->input('designation');

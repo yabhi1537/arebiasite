@@ -18,52 +18,15 @@ class ProjectTypeController extends Controller
           if($types !="" ){
             $projecty->where('type', 'LIKE', "%$types%")->get();
           }
-          $projectype =$projecty->Paginate(5);
-          
-          $output = '';
-          if (!$projectype->isEmpty()) {
-              foreach ($projectype as $new) {
-                $output .= '<tr>';
-                  $output .= '<td>'.$new->id.'
-              </td>
-              <td>
-                  '.$new->type.'
-              </td>
-              <td>
-              '.$new->type_ar.'
-            </td>
-            <td class="d-flex justify-content-center">
-
-                  <a href="'.route('projectype.show',$new->id).'"
-                      class=""><i class="bi bi-eye-fill f-21" ></i></a>
-         
-                  <a href="'.route('projectype.edit',$new->id).'"
-                      class=""><i class="bi bi-pencil-square f-21"></i></a>
-          
-                  <span>
-                      <form method="POST" action="'.route('projectype.destroy',$new->id).'">
-                          '.csrf_field().'
-                          '.method_field("DELETE").'
-                         
-                          <button type="submit" class="btn-trash"><i class="bi bi-trash f-21"></i></button>
-                      </form>
-                  </span>
-              </td>';
-              $output .= '</tr>';
-              }
-              
-          } else {
-              $output .= ' <tr> <td colspan="4"> Note : Project Type Is Empty ?.</td></tr>';
-          }
-          return $output;
+          $projectype =$projecty->Paginate(10);
+          return view('admin.projectype.data',compact('projectype'));
+        
       }
 
       
       $projecty =project_type::Query();
-      if($types !="" ){
-        $projecty->where('type', 'LIKE', "%$types%")->get();
-      }
-            $projectype =$projecty->Paginate(5);
+      
+            $projectype =$projecty->Paginate(10);
             $protyp =  project_type::all();
 
      return view('admin.projectype.index',compact('projectype','protyp'));
@@ -87,7 +50,7 @@ class ProjectTypeController extends Controller
      $data->type = $request->input('type');
      $data->type_ar = $request->input('type_ar');
      $data->save();
-     return redirect()->route('projectype.index')->with('message','News Type Add Successfully');
+     return redirect()->route('projectype.index')->with('message','Project Type Add Successfully');
    }
 
    public function show($id)
@@ -114,14 +77,14 @@ class ProjectTypeController extends Controller
      $data->type = $request->input('type');
      $data->type_ar = $request->input('type_ar');
      $data->save();
-     return redirect()->route('projectype.index')->with('message','News Type Updated Successfully');
+     return redirect()->route('projectype.index')->with('message','Project Type Updated Successfully');
    }
 
    public function destroy(Request $request,$id)
    {
      $data = project_type::find($id);
      $data->delete();
-     return redirect()->route('projectype.index')->with('message','News Type Deleted Successfully');
+     return redirect()->route('projectype.index')->with('message','Project Type Deleted Successfully');
 
    }
 }
