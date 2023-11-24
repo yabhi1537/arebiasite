@@ -3,16 +3,18 @@
                     <tr>
                         <th>P Type</th>
                         <th>P Name</th>
-                        <th>Category</th>                     
+                        <th>Category</th>
+                        
+                        <!-- <th>p_id</th> -->
+                        <!-- <th>Invoice Id</th> -->
                         <th>TransactionId</th>
-                        <th>Donation</th>
+                         <th>Donation</th>
                         <th>Status</th>
-                        <th>Created</th>
-                        <th class="text-center">Action</th>
+                        <th>Created_at</th>
+                        <th class="text-center" colspan="2">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-
                     @if(!$data->isEmpty())
                     @foreach($data as $tran)
                     <tr>
@@ -27,6 +29,12 @@
                             {{ $tran->category }}
                         </td>
                        
+                        <!-- <td>
+                            {{ $tran->p_id }}
+                        </td> -->
+                        <!-- <td>
+                            {{ $tran->invoice_id }}
+                        </td> -->
                         <td>
                             {{ $tran->transactionId }}
                         </td>
@@ -37,17 +45,16 @@
                             {{ $tran->payment_status }}
                         </td>
                         <td>
-                            {{ date('d-m-Y H:i:s', strtotime($tran->created_date)) }}
-                        </td>
+                              {{ date('d-m-Y H:i:s', strtotime($tran->created_date)) }}
+                        </td> 
                         <td class="d-flex justify-content-center">
-                            <a href="{{ route('transaction.show',$tran->id)}}" class=""><i
+                            <a href="{{ route('pendingshow',$tran->id)}}" class=""><i
                                     class="bi bi-eye-fill f-21"></i></a>
 
                             <span>
-                                <form method="POST" action="{{ route('transaction.destroy',$tran->id) }}">
+                                <form method="POST" action="{{ route('pendingdestroy',$tran->id) }}">
                                     @csrf
-                                    @method('DELETE')
-                                    {{ method_field('delete') }}
+                                    @method('POST')
                                     <button type="submit" class="btn-trash"><i class="bi bi-trash f-21"></i></button>
                                 </form>
                             </span>
@@ -55,7 +62,7 @@
                     </tr>
                     @endforeach
                     @else
-                    <td> Note : Transaction Is Empty ?.</td>
+                    <td colspan="5"> Note : Transaction Is Empty ?.</td>
                     @endif
                 </tbody>
             </table>

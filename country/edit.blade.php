@@ -3,10 +3,18 @@
 @section('content')
 <div class="card-body mt-0">
     <h4 class="card-title">Edit Country</h4>
-    <form id="baseForm" name="baseForm" class="forms-sample" method="POST" action="{{ route('country.update',$country->id)}}"
+    <form autocomplete="off" id="baseForm" name="baseForm" class="forms-sample" method="POST" action="{{ route('country.update',$country->id)}}"
         enctype="multipart/form-data">
         @csrf
         @method('PUT')
+         <div class="form-group">
+            <label for="email">Country Title</label>
+            <input type="text" value="{{ $country->title}}" class="form-control required" id="title" placeholder="Name" name="title">
+
+            @error('title')
+            <label id="	title-error" class="text-danger mt-2" for="title"> {{ $message }}</label>
+            @enderror
+        </div>
         <div class="form-group">
             <label for="title">Country Title (AR)	</label>
             <input type="text" value="{{ $country->title_ar}}" class="form-control required" id="title_ar" placeholder="Name" name="title_ar">
@@ -15,14 +23,7 @@
             <label id="title-error" class="text-danger mt-2" for="title"> {{ $message }}</label>
             @enderror
         </div>
-        <div class="form-group">
-            <label for="email">Country Title</label>
-            <input type="text" value="{{ $country->title}}" class="form-control required" id="title" placeholder="Name" name="title">
-
-            @error('title')
-            <label id="	title-error" class="text-danger mt-2" for="title"> {{ $message }}</label>
-            @enderror
-        </div>
+       
         <div class="form-group">
             <label for="title">Country</label>
             <input type="text" value="{{ $country->country}}" class="form-control required" id="country" placeholder="Name" name="country">

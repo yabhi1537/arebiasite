@@ -5,8 +5,10 @@
     <div class="card">
         <div class="card-body">
             <div class="d-flex justify-content-between mb-3">
-                <h4 class="card-title mb-0">All Transaction</h4>
-                <a href="javascript:void(0);" onclick="getdata_pdf()" class="btn btn-primary  btn-roundedmt-5 float-right">Export Pdf
+                <h4 class="card-title mb-0">Failed Transaction</h4>
+                <!-- <a href="" class="btn btn-primary  btn-roundedmt-5 float-right">Add
+                    Sponsor Type </a> -->
+                    <a href="javascript:void(0);" onclick="getdata_pdf()" class="btn btn-primary  btn-roundedmt-5 float-right">Export Pdf
                 </a>
                 <a href="javascript:void(0);"  onclick="getdata_excel()" class="btn btn-primary  btn-roundedmt-5 float-right">Export Excel
                 </a>
@@ -16,9 +18,8 @@
             @endif
             <div class="fillterDrpdown">
                 <div class="">
-
                     <div class="row">
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <select name="p_type" id="p_type" class="form-select" aria-label="Default select example">
                                 <option value="">Project Type</option>
                                 @if(!$projectyp->isEmpty())
@@ -30,7 +31,7 @@
                                 @endif
                             </select>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <select name="category" id="category" class="form-select"
                                 aria-label="Default select example">
                                 <option value="">Category Search</option>
@@ -43,7 +44,7 @@
                                 @endif
                             </select>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <select name="p_name" id="p_name" class="form-select" aria-label="Default select example">
                                 <option value="">Project Name</option>
                                 @if(!$projects->isEmpty())
@@ -56,25 +57,13 @@
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <input name="transactionId" id="transactionId" placeholder="search by transactionId..."
+                            <input autocomplete="off" name="transactionId" id="transactionId" placeholder="search by transactionId..."
                                 value="{{ Request::get('transactionId')}}">
                         </div>
-                        <div class="col-md-2">
-                            <select name="payment_status" id="payment_status" class="form-select"
-                                aria-label="Default select example">
-                                <option value="">Payment Status</option>
-                                <option value="Paid">
-                                    Paid </option>
-                                <option value="Pending">
-                                    Pending</option>
-                                <option value="Failed">
-                                    Failed</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3 mt-2">
+                         <div class="col-md-3 mt-2">
                             <div id="datepicker-popup" class="input-group date datepicker">
                                 <input autocomplete="off" type="text" placeholder="From Date" class="form-control" id="from_date"
-                                    name="from_date" value="{{ Request::get('datesearch')}}">
+                                    name="from_date" >
                                 <span class="input-group-addon input-group-append border-left">
                                     <span class="mdi mdi-calendar input-group-text"></span>
                                 </span>
@@ -83,12 +72,12 @@
                         <div class="col-md-3 mt-2">
                             <div id="datepicker-popups" class="input-group date datepickers">
                                 <input autocomplete="off" type="text" placeholder="To Date" class="form-control" id="to_date"
-                                    name="to_date" value="{{ Request::get('datesearch')}}">
+                                    name="to_date" >
                                 <span class="input-group-addon input-group-append border-left">
                                     <span class="mdi mdi-calendar input-group-text"></span>
                                 </span>
                             </div>
-                        </div> 
+                        </div>
                     </div>
                     <div class="row justify-content-end mt-3 mr-2">
                         <div class="col-md-2 p-1 ">
@@ -96,40 +85,40 @@
                                 results</button>
                         </div>
                         <div class="col-md-2 p-1 ">
-                            <a href="{{ route('transaction.index') }}"
+                            <a href="{{ route('failedtransaction') }}"
                                 class="btn btn-inverse-light btn-fw w-100">Clear</a>
                         </div>
                     </div>
-
                 </div>
             </div>
             <div id="projectlist">
-                @include('admin.transaction.data')
+                @include('admin.failedtransaction.data')
             </div>
         </div>
     </div>
 </div>
 <script type="text/javascript">
+    
 function getdata(page = 0) {
     var p_type = $('#p_type').val();
-    var from_date = $('#from_date').val();
-    var to_date = $('#to_date').val();
     var category = $('#category').val();
     var p_name = $('#p_name').val();
     var transactionId = $('#transactionId').val();
     var payment_status = $('#payment_status').val();
+     var from_date = $('#from_date').val();
+    var to_date = $('#to_date').val();
 
     $.ajax({
-        url: "{{ route('transaction.index') }}?page=" + page,
+        url: "{{ route('failedtransaction') }}?page=" + page,
         type: "GET",
         data: {
             'p_type': p_type,
-            'from_date': from_date,
-            'to_date': to_date,
             'category': category,
             'p_name': p_name,
             'transactionId': transactionId,
-            'payment_status': payment_status
+            'payment_status': payment_status,
+            'from_date': from_date,
+            'to_date': to_date,
         },
         dataType: 'html',
         success: function(data) {
@@ -168,7 +157,6 @@ $(document).ready(function() {
         }
     });
 });
-
 $(document).ready(function() {
 
 if ($("#datepicker-popup,#datepicker-popups".length)) {
@@ -181,6 +169,7 @@ if ($("#datepicker-popup,#datepicker-popups".length)) {
 }
 });
 
+
 function getdata_pdf() {
     var p_type = $('#p_type').val();
     var from_date = $('#from_date').val();
@@ -188,10 +177,9 @@ function getdata_pdf() {
     var category = $('#category').val();
     var p_name = $('#p_name').val();
     var transactionId = $('#transactionId').val();
-    var payment_status = $('#payment_status').val();
 
     $.ajax({
-        url: "{{ route('generatePDF', 'pdf') }}",
+        url: "{{ route('failedtransactionPDF', 'pdf') }}",
         type: "GET",
         data: {
             'p_type': p_type,
@@ -200,7 +188,6 @@ function getdata_pdf() {
             'category': category,
             'p_name': p_name,
             'transactionId': transactionId,
-            'payment_status': payment_status
         },
          xhrFields: {
                 responseType: 'blob'
@@ -224,10 +211,9 @@ function getdata_excel() {
     var category = $('#category').val();
     var p_name = $('#p_name').val();
     var transactionId = $('#transactionId').val();
-    var payment_status = $('#payment_status').val();
 
     $.ajax({
-        url: "{{ route('fileExport', ['excel','xlsx']) }}",
+        url: "{{ route('failedtransactionExport', ['excel','xlsx']) }}",
         type: "GET",
         data: {
             'p_type': p_type,
@@ -236,7 +222,6 @@ function getdata_excel() {
             'category': category,
             'p_name': p_name,
             'transactionId': transactionId,
-            'payment_status': payment_status
         },
          xhrFields: {
                 responseType: 'blob'

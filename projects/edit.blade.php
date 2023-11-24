@@ -3,12 +3,31 @@
 @section('content')
 
 <div class="card-body mt-0">
-    <h4 class="card-title">Add Project</h4>
+    <h4 class="card-title">Edit Project</h4>
     <form autocomplete="off" id="baseForm" name="baseForm" class="forms-sample" method="POST"
         action="{{ route('project.update', $projeId->project_id) }}" enctype="multipart/form-data">
         @csrf
         @method('PUT')
         <input type="hidden" value="{{$projeId->image}}" name="images">
+        
+        
+        <div class="form-group">
+            <label for="title">Project Name</label>
+            <input type="text" class="form-control required" value="{{ $projeId->project_name }}" id="project_name"
+                placeholder="Name" name="project_name" />
+
+            @error('project_name')
+            <label id="title-error" class="text-danger mt-2" for="title"> {{ $message }}</label>
+            @enderror
+        </div>
+        <div class="form-group">
+            <label for="title">Project Name (AR)</label>
+            <input type="text" class="form-control required" value="{{ $projeId->project_name_ar }}" id="project_name_ar " placeholder="Name" name="project_name_ar" />
+
+            @error('project_name_ar')
+            <label id="title-error" class="text-danger mt-2" for="title"> {{ $message }}</label>
+            @enderror
+        </div>
 
         <div class="form-group">
             <label for="newstype required">Project Type</label>
@@ -80,24 +99,6 @@
             </select>
 
             @error('project_country')
-            <label id="title-error" class="text-danger mt-2" for="title"> {{ $message }}</label>
-            @enderror
-        </div>
-
-        <div class="form-group">
-            <label for="title">Project Name</label>
-            <input type="text" class="form-control required" value="{{ $projeId->project_name }}" id="project_name"
-                placeholder="Name" name="project_name" />
-
-            @error('project_name')
-            <label id="title-error" class="text-danger mt-2" for="title"> {{ $message }}</label>
-            @enderror
-        </div>
-        <div class="form-group">
-            <label for="title">Project Name (AR)</label>
-            <input type="text" class="form-control required" value="{{ $projeId->project_name_ar }}" id="project_name_ar " placeholder="Name" name="project_name_ar" />
-
-            @error('project_name_ar')
             <label id="title-error" class="text-danger mt-2" for="title"> {{ $message }}</label>
             @enderror
         </div>
@@ -289,17 +290,14 @@
             <label id="title-error" class="text-danger mt-2" for="title"> {{ $message }}</label>
             @enderror
         </div>
-
         <div class="form-group">
-            <label for="title">Url</label>
-            <input type="url" class="form-control required" value="{{ $projeId->short_url }}" id="to_date"
-                placeholder="url" name="short_url" />
+            <label>Current Image</label><br>
 
-            @error('short_url')
-            <label id="title-error" class="alert alert-danger" for="short_url"> {{ $message }}</label>
-            @enderror
+            @if($projeId->image)
+            <img class="img-thumbnail" src="{{ asset('uploads/projectimage/'.$projeId->image) }}"
+                style="height: 100px;width:100px;">
+            @endif
         </div>
-
         <div class="form-group">
             <label>Image</label>
             <input type="file" name="image" class="file-upload-default">

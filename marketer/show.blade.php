@@ -39,7 +39,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="wrapper d-block d-sm-flex align-items-center justify-content-between">
-                                <h4 class="card-title mb-0">Show Countries</h4>
+                                <h4 class="card-title mb-0">Show marketer & Board</h4>
                                 <ul class="nav nav-tabs tab-solid tab-solid-primary mb-0" id="myTab" role="tablist">
                                     <li class="nav-item">
                                         <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info"
@@ -52,75 +52,60 @@
                                 <div class="tab-content" id="myTabContent">
                                     <div class="tab-pane fade show active" id="info" role="tabpanel"
                                         aria-labelledby="info">
-                                           <div class="form-group row ">
-                                            <label for="exampleInputEmail2" class="col-sm-5 col-form-label">
-                                                <strong>Country Title</strong> </label>
-                                            <div class="col-sm-7">
-                                                {{ $country->title}}
-                                            </div>
-                                        </div>
-                                        <div class="form-group row ">
-                                            <label for="exampleInputEmail2" class="col-sm-5 col-form-label">
-                                                <strong>Country Title (AR)</strong> </label>
-                                            <div class="col-sm-7">
-                                                {{ $country->title_ar}}
-                                            </div>
-                                        </div>
 
-                                         <div class="form-group row ">
-                                            <label for="exampleInputEmail2" class="col-sm-5 col-form-label">
-                                                <strong>Country</strong> </label>
+                                        <div class="form-group row ">
+                                            <label for="exampleInputEmail2" class="col-sm-5 col-form-label"><strong>
+                                                Full Name</strong></label>
                                             <div class="col-sm-7">
-                                                <strong></strong> {{ $country->country}}
+                                                {{ $marketer->name}}
+                                            </div>
+                                        </div>
+                                   
+                                        <div class="form-group row ">
+                                            <label for="exampleInputEmail2" class="col-sm-5 col-form-label"><strong>
+                                                Email</strong></label>
+                                            <div class="col-sm-7">
+                                                {{ $marketer->email}}
                                             </div>
                                         </div>
                                         <div class="form-group row ">
-                                            <label for="exampleInputEmail2" class="col-sm-5 col-form-label">
-                                                <strong>Country (AR)</strong> </label>
+                                            <label for="exampleInputEmail2" class="col-sm-5 col-form-label"><strong>
+                                            Country</strong></label>
                                             <div class="col-sm-7">
-                                                {{ $country->country_ar}}
+                                                {{ $marketer->country}}
                                             </div>
                                         </div>
+                                        <div class="form-group row ">
+                                            <label for="exampleInputEmail2" class="col-sm-5 col-form-label"><strong>Join Date</strong>
+                                           </label>
+                                            <div class="col-sm-7">
+                                                {{ $marketer->join_date}}
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="exampleInputPassword2" class="col-sm-5 col-form-label"><strong>
+                                                   Marketer Links</strong></label>
+                                            <div class="col-sm-7">
+                                            @foreach($link as $links)
+                                                <p>{{ $links->generatelink}} </p>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                        <div class="form-group row ">
+                                            <label for="exampleInputEmail2" class="col-sm-5 col-form-label"><strong>Created
+                                                At</strong></label>
+                                            <div class="col-sm-7">
+                                                {{ $marketer->created_at}}
+                                            </div>
+                                        </div>
+                           
 
-                                        
-                                        <div class="form-group row ">
-                                            <label for="exampleInputEmail2" class="col-sm-5 col-form-label">
-                                                <strong>Country latitude</strong> </label>
-                                            <div class="col-sm-7">
-                                                {{ $country->latitude}}
-                                            </div>
-                                        </div>
-                                        <div class="form-group row ">
-                                            <label for="exampleInputEmail2" class="col-sm-5 col-form-label">
-                                                <strong>Country longitude</strong> </label>
-                                            <div class="col-sm-7">
-                                                <strong></strong> {{ $country->longitude}}
-                                            </div>
-                                        </div>
-                                        <div class="form-group row ">
-                                            <label for="exampleInputEmail2" class="col-sm-5 col-form-label">
-                                                <strong>Country Short Name</strong> </label>
-                                            <div class="col-sm-7">
-                                                <strong></strong> {{ $country->short_name}}
-                                            </div>
-                                        </div>
-                                        <div class="form-group row ">
-                                            <label for="exampleInputEmail2" class="col-sm-5 col-form-label">
-                                                <strong>Status</strong> </label>
-                                            <div class="col-sm-7">
-                                                @if($country->status == 1)
-                                                Active
-                                                @elseif($country->status == 0)
-                                                Deactive
-                                                @endif
-                                            </div>
-                                        </div>
+
                                     </div><!-- tab content ends -->
 
                                 </div>
                             </div>
-                            <div class="text-center mt-3 "> <a href="{{ route('country.index') }}" class="btn btn-outline-danger w-25">Back</a></div>
-                            
+                            <div class="text-center mt-3 "> <a href="{{ route('marketer.index') }}" class="btn btn-outline-danger w-25">Back</a></div>
                         </div>
                     </div>
                 </div>
@@ -129,7 +114,6 @@
         </div>
     </div>
     <!-- ==================================================mobail======================================== -->
-
 </div>
 </div>
 

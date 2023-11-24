@@ -1,4 +1,19 @@
-<table class="table table-bordered">
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Report PDF</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<style>
+body{
+  font-family: DejaVu Sans, sans-serif;
+}
+</style>
+<body>
+    <h1>{{ $title }}</h1>
+    <p>{{ $date }}</p>
+     <table class="table table-bordered">
                 <thead>
                     <tr>
                         <th>P Type</th>
@@ -8,12 +23,13 @@
                         <th>Donation</th>
                         <th>Status</th>
                         <th>Created</th>
-                        <th class="text-center">Action</th>
+                      
                     </tr>
                 </thead>
                 <tbody>
-
+                  
                     @if(!$data->isEmpty())
+                    @php $total=0; @endphp
                     @foreach($data as $tran)
                     <tr>
                         <td>
@@ -38,25 +54,17 @@
                         </td>
                         <td>
                             {{ date('d-m-Y H:i:s', strtotime($tran->created_date)) }}
-                        </td>
-                        <td class="d-flex justify-content-center">
-                            <a href="{{ route('transaction.show',$tran->id)}}" class=""><i
-                                    class="bi bi-eye-fill f-21"></i></a>
-
-                            <span>
-                                <form method="POST" action="{{ route('transaction.destroy',$tran->id) }}">
-                                    @csrf
-                                    @method('DELETE')
-                                    {{ method_field('delete') }}
-                                    <button type="submit" class="btn-trash"><i class="bi bi-trash f-21"></i></button>
-                                </form>
-                            </span>
-                        </td>
+                        </td>                
                     </tr>
+                      @php $total=number_format($total + $tran->donate_amount,2) ; @endphp
                     @endforeach
+                    <tr><td></td><td></td><td></td><td><b>Total Donation</b></td><td><b>{{$total}} KD</b></td></tr>
                     @else
                     <td> Note : Transaction Is Empty ?.</td>
                     @endif
                 </tbody>
             </table>
-        {!! $data->withQueryString()->links('pagination::bootstrap-5') !!}
+  
+  
+</body>
+</html>

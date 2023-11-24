@@ -41,16 +41,19 @@
                                 <h4 class="card-title mb-0">Show Project</h4>
                                 <ul class="nav nav-tabs tab-solid tab-solid-primary mb-0" id="myTab" role="tablist">
                                     <li class="nav-item">
-                                        <a href="" class="nav-link active" id="info-tab" data-toggle="tab" href="#info"
-                                            role="tab" aria-controls="info" aria-expanded="true">Info</a>
+                                        <a href="" class="nav-link active" id="info-tab" data-toggle="modal"
+                                            href="#info" role="tab" data-target="#exampleModal" aria-controls="info"
+                                            aria-expanded="true">Generate Campaign Link</a>
                                     </li>
                                 </ul>
                             </div>
+
                             <div class="wrapper">
                                 <hr>
                                 <div class="tab-content" id="myTabContent">
                                     <div class="tab-pane fade show active" id="info" role="tabpanel"
                                         aria-labelledby="info">
+
                                         <div class="form-group row ">
                                             <label for="exampleInputEmail2" class="col-sm-5 col-form-label"><strong>
                                                     images </strong></label>
@@ -177,23 +180,38 @@
                                             <label for="exampleInputPassword2" class="col-sm-5 col-form-label"><strong>
                                                     Status</strong></label>
                                             <div class="col-sm-7">
-                                                {{ $projeId->status  }}
+												@if($projeId->status  == 0)
+                                                New ProjectController
+                                                @else
+                                                Complete Project
+                                                @endif
+                                            </div>
+                                        </div>
+                                         <div class="form-group row">
+                                            <label for="exampleInputPassword2" class="col-sm-5 col-form-label"><strong>
+                                                    Publish Status </strong></label>
+                                            <div class="col-sm-7">
+                                             
+                                                @if($projeId->publish_status  == 1)
+                                                Public 
+                                                @else
+                                                Private
+                                                @endif
                                             </div>
                                         </div>
                                         <div class="form-group row">
                                             <label for="exampleInputPassword2" class="col-sm-5 col-form-label"><strong>
                                                     Donationtype Status </strong></label>
                                             <div class="col-sm-7">
-                                                {{ $projeId->donationtype_status}}
+                                             
+                                                @if($projeId->donationtype_status  == 0)
+                                                Enabled 
+                                                @else
+                                                Disabled
+                                                @endif
                                             </div>
                                         </div>
-                                        <div class="form-group row">
-                                            <label for="exampleInputPassword2" class="col-sm-5 col-form-label"><strong>
-                                                    Description </strong></label>
-                                            <div class="col-sm-7">
-                                                {!! $projeId->description!!}
-                                            </div>
-                                        </div>
+                                        
                                         <div class="form-group row">
                                             <label for="exampleInputPassword2" class="col-sm-5 col-form-label"><strong>
                                                     Main
@@ -218,7 +236,7 @@
                                         </div>
                                         <div class="form-group row">
                                             <label for="exampleInputPassword2"
-                                                class="col-sm-5 col-form-label"><strong>Url</strong></label>
+                                                class="col-sm-5 col-form-label"><strong>Short Link</strong></label>
                                             <div class="col-sm-7">
                                                 {{ $projeId->short_url}}
                                             </div>
@@ -230,12 +248,27 @@
                                                 {{ $projeId->project_code  }}
                                             </div>
                                         </div>
-
+                                        <div class="form-group row">
+                                            <label for="exampleInputPassword2" class="col-sm-5 col-form-label"><strong>
+                                                    Description </strong></label>
+                                            <div class="col-sm-7">
+                                                {!! $projeId->description!!}
+                                            </div>
+                                        </div>
                                         <div class="form-group row">
                                             <label for="exampleInputPassword2" class="col-sm-5 col-form-label"><strong>
                                                     Project Description (AR)</strong></label>
                                             <div class="col-sm-7">
                                                 {!! $projeId->description_ar !!}
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="exampleInputPassword2" class="col-sm-5 col-form-label"><strong>
+                                                   Marketer Links</strong></label>
+                                            <div class="col-sm-7">
+                                            @foreach($link as $links)
+                                                <p>{{ $links->generatelink}} </p>
+                                                @endforeach
                                             </div>
                                         </div>
                                         <div class="form-group row">
@@ -248,7 +281,7 @@
                                     </div><!-- tab content ends -->
                                 </div>
                             </div>
-                            <a href="{{ route('project.index') }}" class="btn btn-outline-danger">Back</a>
+                            <div class="text-center mt-3 "> <a href="{{ route('project.index') }}" class="btn btn-outline-danger w-25">Back</a></div>
                         </div>
                     </div>
                 </div>
@@ -261,5 +294,125 @@
 </div>
 </div>
 
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="baseForm" name="" class="forms-sample" method="POST" action="{{ route('generatelinkstore')}}"
+            enctype="multipart/form-data">
+            @csrf
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Generate Link</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="form-group">
+                            <label for="newstype required">Language</label>
 
-@endsection
+                            <select class="form-control required" id="languageid" name="language" required>
+                                <option value="en">English</option>
+                                <option value="ar">Arabic</option>
+                            </select>
+                            @error('language')
+                            <label id="title-error" class="text-danger mt-2" for="title">
+                                {{ $message }}</label>
+                            @enderror
+                        </div>
+                      
+                        <div class="form-group ">
+                            <label for="date">Date</label>
+                            <div id="datepicker-popup" class="input-group date datepicker">
+                                <input autocomplete="off" type="text" placeholder="Date" class="form-control"
+                                    id="date" name="date" value="">
+                                <span class="input-group-addon input-group-append border-left">
+                                    <span class="mdi mdi-calendar input-group-text"></span>
+                                </span>
+                            </div>
+                            @error('date')
+                            <label id="title-error" class="text-danger mt-2" for="title">
+                                {{ $message }}</label>
+                            @enderror
+                        </div>
+                        <div class="form-group">
+                            <label for="time">Time</label>
+                            <div class="input-group date" id="timepicker-example" data-target-input="nearest">
+                                <div class="input-group" data-target="#timepicker-example" data-toggle="datetimepicker">
+                                    <input type="text" name="time" class="form-control datetimepicker-input"
+                                        data-target="#timepicker-example" placeholder="Time">
+                                    <div class="input-group-addon input-group-append"><i
+                                            class="mdi mdi-clock input-group-text"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            @error('time')
+                            <label id="time-error" class="text-danger mt-2" for="time">
+                                {{ $message }}</label>
+                            @enderror
+                        </div>
+                        <div class="form-group">
+                            <label for="newstype required">Marketer</label>
+                            <select class="form-control required" id="myInput1" name="marketer"
+                                onchange="createlink(this.value,'{{$projeId->project_code}}')" required>
+                                <option value="">Select</option>
+                                @if(! $marketers->isEmpty())
+                                @foreach( $marketers as $markete)
+                                <option value="{{ $markete->id }}">{{$markete->name}}</option>
+                                @endforeach
+                                @endif
+                            </select>
+                            @error('marketer')
+                            <label id="title-error" class="text-danger mt-2" for="title">
+                                {{ $message }}</label>
+                            @enderror
+                        </div>
+                        <div class="form-group">
+                            <label for="title">Generate Link</label>
+                            <input autocomplete="off" type="text" value="" class="form-control required" id="myInput2"
+                                placeholder="Generate Link" name="generatelink" required>
+                            @error('generatelink')
+                            <label id="title-error" class="text-danger mt-2" for="title">
+                                {{ $message }}</label>
+                            @enderror
+                        </div>
+                    </div>
+                    <!-- <input type="hidden" value="{{ $projeId->project_id }}"  name="project_id"> -->
+                      <input type="hidden" value="{{ $projeId->project_code }}"  name="project_code">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success mr-2">Send</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div> 
+   
+
+    <script type="text/javascript">
+    function createlink(marketerid, projectid) {
+
+        var languageid = $('#languageid').val();
+         var link = "{{ url('')}}/" + languageid + "/" + marketerid + "/" + projectid + "";
+        $('#myInput2').val(link);
+        }
+
+    if ($("#timepicker-example".length)) {
+        $('#timepicker-example').datetimepicker({
+            format: 'LT'
+        });
+    }
+    $(document).ready(function() {
+     
+        if ($("#datepicker-popup".length)) {
+            $('#datepicker-popup').datepicker({
+                enableOnReadonly: true,
+                format: 'yyyy-mm-dd',
+                autoclose: true,
+                todayHighlight: true,
+            });
+        }
+    });
+    </script>
+    @endsection

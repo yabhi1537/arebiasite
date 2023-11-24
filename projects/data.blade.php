@@ -4,22 +4,19 @@
 
                         <th>Image</th>
                         <th>Name </th>
-                        <th>Type</th>
+                        <th>Type</th> 
                         <th>Category</th>
                         <th>Continents</th>
                         <th>Country</th>
-                        <th>Price</th>
+                        <!-- <th>Price</th> -->
+                        <th>Publish Status</th>
                         <th>Status</th>
-                       
                         <th class="text-center">Action</th>
                     </tr>
                 </thead>
-                <tbody >
+                <tbody>
                     @if(!$project->isEmpty())
                     @foreach($project as $new)
-                    <tr>
-                        <td></td>
-                    </tr>
                     <tr>
                         <td> <img src="{{ asset('uploads/projectimage/'.$new->image) }}"
                                 style="height: 30px;width:30px;"></td>
@@ -29,8 +26,20 @@
                         <td>{{ $new->ProjCat->title  }}</td>
                         <td>{{ $new->project_continents }}</td>
                         <td>{{ $new->project_country }}</td>
-                        <!-- <td>{{ $new->project_code }}</td> -->
-                        <td>{{ $new->project_price }}</td>
+                        <!-- <td>{{ $new->project_price }}</td> -->
+
+                        <td class="text-center">
+                            @if($new->publish_status =='2')
+                            <span id="bookForms" class="btn btn-info btn-rounded btn-sm"
+                                onclick="ProPublisStatus('{{ $new->project_id }}',1)">Public</span>
+                            @else
+                            @if($new->publish_status =='1')
+                            <span id="bookForms" class="btn btn-primary btn-rounded btn-sm"
+                                onclick="ProPublisStatus('{{ $new->project_id }}',2 )">Private</span>
+                            @endif
+                            @endif
+                        </td>
+
                         <td class="text-center">
                             @if($new->donationtype_status =='0')
                             <span id="bookForm" class="btn btn-danger btn-rounded btn-sm"

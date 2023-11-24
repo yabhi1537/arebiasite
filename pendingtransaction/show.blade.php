@@ -38,7 +38,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="wrapper d-block d-sm-flex align-items-center justify-content-between">
-                                <h4 class="card-title mb-0">All Transactions</h4>
+                                <h4 class="card-title mb-0">Show Pending Transactions</h4>
                                 <ul class="nav nav-tabs tab-solid tab-solid-primary mb-0" id="myTab" role="tablist">
                                     <li class="nav-item">
                                         <a href="" class="nav-link active" id="info-tab" data-toggle="tab" href="#info"
@@ -80,7 +80,13 @@
                                                 {{ $data->p_code }}
                                             </div>
                                         </div>
-                                       
+                                        <div class="form-group row">
+                                            <label for="exampleInputPassword2" class="col-sm-5 col-form-label"><strong>
+                                                    Project Id</strong> </label>
+                                            <div class="col-sm-7">
+                                                {{ $data->p_id }}
+                                            </div>
+                                        </div>
                                         <div class="form-group row">
                                             <label for="exampleInputPassword2" class="col-sm-5 col-form-label"><strong>
                                                     Invoice Id</strong> </label>
@@ -113,7 +119,7 @@
                                             <label for="exampleInputPassword2" class="col-sm-5 col-form-label"><strong>
                                                     Donate Amount </strong></label>
                                             <div class="col-sm-7">
-                                                {{ $data->donate_amount }} KD
+                                                {{ $data->donate_amount }} kD
                                             </div>
                                         </div>
                                         <div class="form-group row">
@@ -169,8 +175,8 @@
                                     </div><!-- tab content ends -->
                                 </div>
                             </div>
-                            <div class="text-center mt-3 "> <a href="{{ route('transaction.index') }}" class="btn btn-outline-danger w-25">Back</a></div>
-                          
+                            <div class="text-center mt-3 "> <a href="{{ route('pendingtransaction') }}" class="btn btn-outline-danger w-25">Back</a></div>
+                            
                         </div>
                     </div>
                 </div>

@@ -38,7 +38,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="wrapper d-block d-sm-flex align-items-center justify-content-between">
-                                <h4 class="card-title mb-0">All Transactions</h4>
+                                <h4 class="card-title mb-0">Show Complete Transactions</h4>
                                 <ul class="nav nav-tabs tab-solid tab-solid-primary mb-0" id="myTab" role="tablist">
                                     <li class="nav-item">
                                         <a href="" class="nav-link active" id="info-tab" data-toggle="tab" href="#info"
@@ -169,8 +169,8 @@
                                     </div><!-- tab content ends -->
                                 </div>
                             </div>
-                            <div class="text-center mt-3 "> <a href="{{ route('transaction.index') }}" class="btn btn-outline-danger w-25">Back</a></div>
                           
+                              <div class="text-center mt-3 "> <a href="{{ route('completetransaction') }}" class="btn btn-outline-danger w-25">Back</a></div>
                         </div>
                     </div>
                 </div>

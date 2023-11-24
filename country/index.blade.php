@@ -41,6 +41,7 @@
                                 @endif
                             </select>
                         </div>
+
                         <div class="col-md-2">
                             <select name="country" id="country" class="form-select" aria-label="Default s
                                 elect example">
@@ -54,32 +55,7 @@
                                 @endif
                             </select>
                         </div>
-                        <!-- <div class="col-md-2">
-                            <select name="status" id="status" class="form-select" aria-label="Default select example">
-                                <option value="">Status</option>
-                                @if(!$count->isEmpty())
-                                @foreach($count as $contin)
-                                <option value="{{ $contin->status}}"
-                                    {{ Request::get('status') == $contin->status  ? 'selected="selected"' : '' }}>
-                                    @if($contin->status == 1)
-                                    Active
-                                    @elseif($contin->status == 0)
-                                    deactive 
-                                    @endif
-                                </option>
-                                @endforeach
-                                @endif
-                            </select>
-                        </div> -->
-                        <!-- <div class="col-md-3">
-                            <div id="datepicker-popup" class="input-group date datepicker">
-                                <input type="text" placeholder="Date Search" class="form-control" id="created_at"
-                                    name="created_at" value="{{ Request::get('created_at')}}">
-                                <span class="input-group-addon input-group-append border-left">
-                                    <span class="mdi mdi-calendar input-group-text"></span>
-                                </span>
-                            </div>
-                        </div> -->
+
                         <div class="col-md-2 d-flex">
                             <button type="button" class="btn btn-inverse-light btn-fw mr-2"
                                 onclick="getserdata()">Filter
@@ -90,77 +66,63 @@
                     </div>
                 </div>
             </div>
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Country</th>
-                        <th class="text-center" colspan="">Action</th>
-                    </tr>
-                </thead>
-                <tbody id="projectlist">
-                    @if(!$country->isEmpty())
-                    @foreach($country as $new)
-                    <tr>
-
-                        <td>
-                            {{ $new->title }}
-                        </td>
-                        <td>
-                            {{ $new->country }}
-                        </td>
-                        <td>
-                            <a href="{{ route('country.show',$new->id)}}"
-                                class="fa fa-eye">View</a>
-                        </td>
-                        <td>
-                            <a href="{{ route('country.edit',$new->id)}}"
-                                class="fa fa-edit">Edit</a>
-                        </td>
-                        <td>
-                            <span>
-                                <form method="POST" action="{{ route('country.destroy',$new->id)}}">
-                                    @csrf
-                                    @method('DELETE')
-
-                                    <button type="submit" class="btn btn-outline-danger  ">delete</button>
-                                </form>
-                            </span>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-            @else
-            <p> Note : Country Is Empty ?.</p>
-            @endif
+            <div id="projectlist">
+                @include('admin.country.data')
+            </div>
         </div>
-        {!! $country->withQueryString()->links('pagination::bootstrap-5') !!}
     </div>
 </div>
 
 <script type="text/javascript">
-function getserdata() {
-
-    var title_ar = $('#title_ar').val();
+function getserdata(page = 0) {
     var title = $('#title').val();
     var country = $('#country').val();
-
-
     $.ajax({
-        url: "{{ route('country.index') }}",
+        url: "{{ route('country.index') }}?page=" + page,
         type: "GET",
         data: {
-            'title_ar': title_ar,
             'title': title,
             'country': country,
         },
         dataType: 'html',
         success: function(data) {
-            $('#projectlist').html(data);
+            $('#projectlist').empty().html(data);
+            location.hash = page;
         }
     })
 }
+
+
+$(document).ready(function() {
+    $(document).on('click', '.pagination a', function(event) {
+        $('li').removeClass('active');
+
+        $(this).parent('li').addClass('active');
+
+        event.preventDefault();
+
+        var myurl = $(this).attr('href');
+
+        var page = $(this).attr('href').split('page=')[1];
+
+        getserdata(page);
+
+    });
+
+    $(window).on('hashchange', function() {
+        if (window.location.hash) {
+            var page = window.location.hash.replace('#', '');
+            if (page == Number.NaN || page <= 0) {
+                return false;
+            } else {
+                getserdata(page);
+            }
+        }
+    });
+});
+
+
+
 
 function changeStatus(id, status) {
 

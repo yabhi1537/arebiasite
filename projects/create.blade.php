@@ -8,7 +8,22 @@
     <form autocomplete="off" id="baseForm" name="baseForm" class="forms-sample" method="POST" action="{{ route('project.store') }}"
         enctype="multipart/form-data">
         @csrf
+        <div class="form-group">
+            <label for="title">Project Name</label>
+            <input type="text" class="form-control required" id="project_name" placeholder="Name" name="project_name" />
 
+            @error('project_name')
+            <label id="title-error" class="text-danger mt-2" for="title"> {{ $message }}</label>
+            @enderror
+        </div>  
+         <div class="form-group">
+            <label for="title">Project Name (AR)</label>
+            <input type="text" class="form-control required" id="project_name_ar" placeholder="Name" name="project_name_ar" />
+
+            @error('project_name_ar')
+            <label id="title-error" class="text-danger mt-2" for="title"> {{ $message }}</label>
+            @enderror
+        </div>
         <div class="form-group">
             <label for="newstype required">Project Type</label>
 
@@ -81,22 +96,7 @@
             @enderror
         </div>
 
-        <div class="form-group">
-            <label for="title">Project Name (AR)</label>
-            <input type="text" class="form-control required" id="project_name_ar" placeholder="Name" name="project_name_ar" />
-
-            @error('project_name_ar')
-            <label id="title-error" class="text-danger mt-2" for="title"> {{ $message }}</label>
-            @enderror
-        </div>
-        <div class="form-group">
-            <label for="title">Project Name</label>
-            <input type="text" class="form-control required" id="project_name" placeholder="Name" name="project_name" />
-
-            @error('project_name')
-            <label id="title-error" class="text-danger mt-2" for="title"> {{ $message }}</label>
-            @enderror
-        </div>
+       
         <div class="form-group">
             <label for="title">Project Title</label>
             <input type="text" class="form-control required" id="title" placeholder="Name"
@@ -281,14 +281,6 @@
             @enderror
         </div>
 
-        <div class="form-group">
-            <label for="title">Url</label>
-            <input type="url" class="form-control required" id="to_date" placeholder="url" name="short_url" />
-
-            @error('short_url')
-            <label id="title-error" class="alert alert-danger" for="short_url"> {{ $message }}</label>
-            @enderror
-        </div>
         <div class="form-group">
             <label>Image</label>
             <input type="file" name="image" class="file-upload-default">
