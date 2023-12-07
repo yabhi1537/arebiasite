@@ -1,14 +1,24 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\FrontendAuthController;
 use App\Http\Controllers\AwqafController;
 use App\Http\Controllers\ProjectfrontController;
+use App\Http\Controllers\ChooseDonationamountController;
 use App\Http\Controllers\SponsorshipController;
 use App\Http\Controllers\ZakatController;
 use App\Http\Controllers\DedicationsController;
+use App\Http\Controllers\RequestyourprojectController;
+use App\Http\Controllers\SmallkiddonorprojectController;
+use App\Http\Controllers\WhoweareController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\MyFatoorahController;
+use App\Http\Controllers\DeductionsController;
+use App\Http\Controllers\NeedyfamiliesfrontController;
+use App\Http\Controllers\ForgotPasswordController;
+
+
 
 use App\Http\Controllers\Admin\AdminLoginController;
 use App\Http\Controllers\Admin\NewsController;
@@ -38,6 +48,22 @@ use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\NeedyFamiliesController;
 use App\Http\Controllers\Admin\ProjectRequestController;
+use App\Http\Controllers\Admin\smallkiddonorController;
+use App\Http\Controllers\Admin\AchievementshowController;
+use App\Http\Controllers\Admin\NewsreportshowController;
+use App\Http\Controllers\Admin\DeductionshowController;
+use App\Http\Controllers\Admin\AggregatesCodesController;
+use App\Http\Controllers\Admin\DonationPolicyController;
+use App\Http\Controllers\Admin\FaqController;
+use App\Http\Controllers\Admin\GovernanceController;
+use App\Http\Controllers\Admin\EmailController;
+use App\Http\Controllers\Admin\ZakatShowController;
+use App\Http\Controllers\Admin\TodoController;
+use App\Http\Controllers\Admin\DashboardController;
+
+
+  
+
 
 
 /*
@@ -64,11 +90,85 @@ Route::prefix('admin')->group(function (){
 	Route::middleware(['auth:admin'])->group(function () {
 		
 	Route::get('/logout',[AdminLoginController::class,'logout'])->name('admin.logout');
-	Route::get('/dashboard',function(){
-		return view('admin.dashboard');
-	});
+	
+	Route::get('/dashboard',[DashboardController::class,'dashboard'])->name('admin.dashboard');
+
 	 
 	});
+
+	
+	Route::group(['prefix' => '/admin','middleware'=>'auth:admin'], function () {
+
+		Route::post('/todo-status', [TodoController::class, 'changeStatusTodo'])->name('changeStatusTodo');
+		
+		   });
+
+		   Route::middleware(['auth:admin'])->group(function() {Route::resource('/admin', TodoController::class)->names([
+
+			'store'   => 'admin.store',
+			// 'edit'     => 'admin.edit',
+			// 'update'   => 'newsreportshow.update',
+			'destroy'  => 'admin.destroy',
+			
+			]);
+			});
+	
+
+	Route::middleware(['auth:admin'])->group(function() {Route::resource('/zakatshow', ZakatShowController::class)->names([
+
+		'index'    => 'zakatshow.index',
+		'create'   => 'zakatshow.create',
+		'store'    => 'zakatshow.store',
+		'show'     => 'zakatshow.show',
+		'edit'     => 'zakatshow.edit',
+		'update'   => 'zakatshow.update',
+		'destroy'  => 'zakatshow.destroy',
+		
+	]);
+	});
+
+	Route::middleware(['auth:admin'])->group(function() {Route::resource('/deductionshow', DeductionshowController::class)->names([
+
+		'index'    => 'deductionshow.index',
+		'show'     => 'deductionshow.show',
+		'edit'     => 'deductionshow.edit',
+		'update'   => 'deductionshow.update',
+		
+		]);
+		});
+
+	Route::middleware(['auth:admin'])->group(function() {Route::resource('/newsreportshow', NewsreportshowController::class)->names([
+
+		'index'    => 'newsreportshow.index',
+		'show'     => 'newsreportshow.show',
+		'edit'     => 'newsreportshow.edit',
+		'update'   => 'newsreportshow.update',
+		
+		]);
+		});
+
+
+	Route::middleware(['auth:admin'])->group(function() {Route::resource('/achievementshow', AchievementshowController::class)->names([
+
+		'index'    => 'achievementshow.index',
+		'show'     => 'achievementshow.show',
+		'edit'     => 'achievementshow.edit',
+		'update'   => 'achievementshow.update',
+		
+		]);
+		});
+
+
+	Route::middleware(['auth:admin'])->group(function() {Route::resource('/smallkiddonor', smallkiddonorController::class)->names([
+
+		'index'    => 'smallkiddonor.index',
+		'show'     => 'smallkiddonor.show',
+		'edit'     => 'smallkiddonor.edit',
+		'update'   => 'smallkiddonor.update',
+		
+		]);
+		});
+
 	Route::middleware(['auth:admin'])->group(function() {Route::resource('/projectrequest', ProjectRequestController::class)->names([
 
 		'index'    => 'projectrequest.index',
@@ -97,6 +197,9 @@ Route::prefix('admin')->group(function (){
 		
 	]);
 	});
+
+	
+	
 
 	Route::group(['prefix' => '/country','middleware'=>'auth:admin'], function () {
 
@@ -218,15 +321,52 @@ Route::prefix('admin')->group(function (){
    ]);
    });
 
+   Route::group(['prefix' => '/pendingtransaction','middleware'=>'auth:admin'], function () {
+    Route::get('/file-export/{id}/{id2}', [TransactionController::class, 'pendingtransactionExport'])->name('pendingtransactionExport');
+Route::get('/generate-pdf/{id}', [TransactionController::class, 'pendingtransactionPDF'])->name('pendingtransactionPDF');
+
+	Route::get('/pendingtransaction', [TransactionController::class, 'pendingtransaction'])->name('pendingtransaction');
+	Route::post('/pendingtransaction/{id}', [TransactionController::class, 'pendingdestroy'])->name('pendingdestroy');
+	Route::get('/pendingtransaction/{id}', [TransactionController::class, 'pendingshow'])->name('pendingshow');
+
+	
+   });
+
+   Route::group(['prefix' => '/failedtransaction','middleware'=>'auth:admin'], function () {
+    Route::get('/file-export/{id}/{id2}', [TransactionController::class, 'failedtransactionExport'])->name('failedtransactionExport');
+    Route::get('/generate-pdf/{id}', [TransactionController::class, 'failedtransactionPDF'])->name('failedtransactionPDF');
+	Route::get('/failedtransaction', [TransactionController::class, 'failedtransaction'])->name('failedtransaction');
+	Route::post('/failedtransaction/{id}', [TransactionController::class, 'destroye'])->name('destroye');
+	Route::get('/failedtransaction/{id}', [TransactionController::class, 'shows'])->name('shows');
+
+	
+   });
+    
+
+   Route::group(['prefix' => '/completetransaction','middleware'=>'auth:admin'], function () {
+	   
+	Route::get('/file-export/{id}/{id2}', [TransactionController::class, 'completetransactionExport'])->name('completetransactionExport');
+    Route::get('/generate-pdf/{id}', [TransactionController::class, 'completetransactionPDF'])->name('completetransactionPDF');   
+
+	Route::get('/completetransaction', [TransactionController::class, 'completetransaction'])->name('completetransaction');
+	Route::post('/completetransaction/{id}', [TransactionController::class, 'transactiondestroy'])->name('transactiondestroy');
+	Route::get('/completetransaction/{id}', [TransactionController::class, 'transactionshow'])->name('transactionshow');
+   });
+
 	Route::middleware(['auth:admin'])->group(function() {Route::resource('/transaction', TransactionController::class)->names([
 
 		'index'    => 'transaction.index',
 		'show'     => 'transaction.show',
 		'destroy'  => 'transaction.destroy',
-
 	   
    ]);
    });
+   
+   Route::group(['prefix' => '/transaction','middleware'=>'auth:admin'], function () {
+
+	   Route::get('/generate-pdf/{id}', [TransactionController::class, 'generatePDF'])->name('generatePDF');
+	   Route::get('/file-export/{id}/{id2}', [TransactionController::class, 'fileExport'])->name('fileExport');
+	});
 
    Route::group(['prefix' => '/contactquery','middleware'=>'auth:admin'], function () {
 
@@ -451,11 +591,13 @@ Route::group(['prefix' => '/sociall','middleware'=>'auth:admin'], function () {
 		
 	]);
 	});
-
+	
 	Route::group(['prefix' => '/projects','middleware'=>'auth:admin'], function () {
 
 		Route::post('/donationtypeStatus', [ProjectController::class, 'donationtypeStatus'])->name('donationtypeStatus');
-	
+		Route::post('/projpubliStatus', [ProjectController::class, 'projpubliStatus'])->name('projpubliStatus');
+		Route::post('/generatelink', [ProjectController::class, 'generatelinkstore'])->name('generatelinkstore');
+
 	   });
 
 	Route::middleware(['auth:admin'])->group(function() {Route::resource('/projects', ProjectController::class)->names([
@@ -474,9 +616,24 @@ Route::group(['prefix' => '/sociall','middleware'=>'auth:admin'], function () {
 	Route::group(['prefix' => '/banner','middleware'=>'auth:admin'], function () {
 
 		Route::post('/bannerStatus', [BannerController::class, 'bannerStatus'])->name('bannerStatus');
+		Route::post('/bannerreposition', [BannerController::class, 'bannerreposition'])->name('banner-reposition');
 	
 	   });
+   
+		   Route::middleware(['auth:admin'])->group(function() {Route::resource('/aggregatescodes', AggregatesCodesController::class)->names([
 
+		'index'    => 'aggregatescodes.index',
+		'create'   => 'aggregatescodes.create',
+		'store'    => 'aggregatescodes.store',
+		'show'     => 'aggregatescodes.show',
+		'edit'     => 'aggregatescodes.edit',
+		'update'   => 'aggregatescodes.update',
+		'destroy'  => 'aggregatescodes.destroy',
+
+		]);
+		});
+
+   
 	Route::middleware(['auth:admin'])->group(function() {Route::resource('/banner', BannerController::class)->names([
 
 		'index'     => 'banner.index',
@@ -486,34 +643,205 @@ Route::group(['prefix' => '/sociall','middleware'=>'auth:admin'], function () {
 		'show'      => 'banner.show',
 		'update'    => 'banner.update',
 		'destroy'   => 'banner.destroy',
+
 		 
 	]);
 	});
+	
+	Route::middleware(['auth:admin'])->group(function() {Route::resource('/donationpolicy', DonationPolicyController::class)->names([
+
+	'index'    => 'donationpolicy.index',
+	'create'   => 'donationpolicy.create',
+	'store'    => 'donationpolicy.store',
+	'show'     => 'donationpolicy.show',
+	'edit'     => 'donationpolicy.edit',
+	'update'   => 'donationpolicy.update',
+	'destroy'  => 'donationpolicy.destroy', 
+
+	]);
+	});
+	 Route::middleware(['auth:admin'])->group(function() {Route::resource('/faq', FaqController::class)->names([
+
+	'index'    => 'faq.index',
+	'create'   => 'faq.create',
+	'store'    => 'faq.store',
+	'show'     => 'faq.show',
+	'edit'     => 'faq.edit',
+	'update'   => 'faq.update',
+	'destroy'  => 'faq.destroy',
+
+	]);
+	});
+	 Route::middleware(['auth:admin'])->group(function() {Route::resource('/governance', GovernanceController::class)->names([
+
+	'index'    => 'governance.index',
+	'show'     => 'governance.show',
+	'edit'     => 'governance.edit',
+	'update'   => 'governance.update',
+	'destroy'  => 'governance.destroy',
+
+	]);
+	});
+	
+	   Route::group(['prefix' => '/mail','middleware'=>'auth:admin'], function () {
+
+		Route::get('/send-email', [EmailController::class, 'index'])->name('emailview');;
+		Route::post('/send-email', [EmailController::class, 'sendmail'])->name('sendmail');
+
+		Route::post('/email-message', [EmailController::class, 'emailmessage'])->name('emailmessage');
+
+		});
+
+		Route::middleware(['auth:admin'])->group(function() {Route::resource('/mail', EmailController::class)->names([
+
+		'index'    => 'mail.index',
+		// 'show'     => 'deductionshow.show',
+		// 'edit'     => 'deductionshow.edit',
+		// 'update'   => 'deductionshow.update',
+
+		]);
+	  });
 
 });
 
-
+/*for fronend*/
 Route::get('/{locale}',function($locale){
 Session::put('locale',$locale);
-           return redirect('/');
-          })->name('switchLan');  //add name to router
+
+        $segments = str_replace(url('/'), '', url()->previous());
+        $segments = array_filter(explode('/', $segments));
+        array_shift($segments);
+        array_unshift($segments, $locale);
+
+        return redirect()->to(implode('/', $segments));
+        
+})->name('switchLan');  //add name to router
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::prefix('{locale}')
     ->where(['locale' => '[a-zA-Z]{2}'])
     ->group(function () {
+		
+	
+	
+		
     
 	Route::get('/login', [FrontendAuthController::class, 'loginGet'])->name('login');
 	Route::post('/login', [FrontendAuthController::class, 'loginPost']);
+	Route::get('/login-cart', [FrontendAuthController::class, 'loginPost_cart'])->name('login-cart');
+	Route::post('/login-cart', [FrontendAuthController::class, 'loginPost_cart']);
+	
+	
 	Route::get('/logout', [FrontendAuthController::class, 'logout'])->name('logout');
+	
+	
+	
 	//Route::get('/register', [FrontendAuthController::class, 'registerGet'])->middleware('auth:web')->name('register');
 	Route::get('/register', [FrontendAuthController::class, 'registerGet'])->name('register');
 	Route::post('/register', [FrontendAuthController::class, 'registerPost']);
+	Route::get('/register-cart', [FrontendAuthController::class, 'registerPost_cart'])->name('register-cart');
+	Route::post('/register-cart', [FrontendAuthController::class, 'registerPost_cart']);
+	
+	
+	Route::get('forget-password', [ForgotPasswordController::class, 'showForgetPasswordForm'])->name('forget.password.get');
+	Route::post('forget-password', [ForgotPasswordController::class, 'submitForgetPasswordForm'])->name('forget.password.post'); 
+	Route::get('reset-password/{token}', [ForgotPasswordController::class, 'showResetPasswordForm'])->name('reset.password.get');
+	Route::post('reset-password', [ForgotPasswordController::class, 'submitResetPasswordForm'])->name('reset.password.post');
 	
 	Route::get('/awqaf', [AwqafController::class, 'index'])->name('awqaf');
 	Route::get('/projects', [ProjectfrontController::class, 'index'])->name('projects');
+	Route::get('/chooseDonation/{id}', [ChooseDonationamountController::class, 'index'])->name('chooseDonation');
+	Route::get('/choosecharityDonation/{id}', [ChooseDonationamountController::class, 'choosecharityDonation'])->name('choosecharityDonation');
 	Route::get('/sponsorship', [SponsorshipController::class, 'index'])->name('sponsorship');
+	
+	/*zakat calculator */
 	Route::get('/zakat', [ZakatController::class, 'index'])->name('zakat');
+	Route::get('/zakat_project', [ZakatController::class, 'zakat_project'])->name('zakat_project');
+	Route::get('/zakat_calculate', [ZakatController::class, 'zakat_calculate'])->name('zakat_calculate');
+	Route::get('/zakat_value_delete', [ZakatController::class, 'zakat_value_delete'])->name('zakat_value_delete');
+	
 	Route::get('/dedications', [DedicationsController::class, 'index'])->name('dedications');
+	Route::get('/giftDonation_preview', [DedicationsController::class, 'giftDonation_preview'])->name('giftDonation_preview');
 	
 	
+	Route::get('/deductions', [DeductionsController::class, 'index'])->name('deductions');
+	
+	
+	Route::get('/requestyourproject', [RequestyourprojectController::class, 'index'])->name('requestyourproject');
+	Route::post('/saveproject_request', [RequestyourprojectController::class, 'saveproject_request'])->name('saveproject_request');
+	
+	Route::get('/needy_families', [NeedyfamiliesfrontController::class, 'index'])->name('needy_families');
+	Route::post('/saveneedy_families', [NeedyfamiliesfrontController::class, 'saveneedy_families'])->name('saveneedy_families');
+	
+
+	Route::get('/smallkiddonorproject', [SmallkiddonorprojectController::class, 'index'])->name('smallkiddonorproject');
+	
+	/*who we are */
+	Route::group(['prefix' => 'whoweare'], function () {
+    Route::get('/aboutus', [WhoweareController::class, 'aboutus'])->name('aboutus');
+    Route::get('/news', [WhoweareController::class, 'news'])->name('news');
+    Route::get('/achievements', [WhoweareController::class, 'achievements'])->name('achievements');
+    Route::get('/gallery', [WhoweareController::class, 'media_gallery'])->name('gallery');
+    Route::get('/newsdetails/{id}', [WhoweareController::class, 'newsdetails'])->name('newsdetails');
+    
+    Route::get('/governance', [WhoweareController::class, 'governance'])->name('governance');
+    Route::get('/faq', [WhoweareController::class, 'faq'])->name('faq');
+    
+    
+    });
+    
+    Route::get('/contactus', [HomeController::class, 'contactus'])->name('contactus');
+    Route::post('/contactus', [HomeController::class, 'contactuspost'])->name('contactus');
+    Route::get('/userprofile', [HomeController::class, 'userprofile'])->name('userprofile');
+    Route::post('/updateuser-profile', [HomeController::class, 'updateuser_profile'])->name('updateuser-profile');
+     Route::post('/updateuser-password', [HomeController::class, 'updateuser_password'])->name('updateuser-password');
+    
+    /*for cart */  
+    Route::get('/cart', [CartController::class, 'index'])->name('cart');
+    Route::get('/add-cart-project/{id}', [CartController::class, 'addProjecttoCart'])->name('addproduct.to.cart');
+    Route::delete('/delete-cart-project', [CartController::class, 'deleteProject'])->name('delete.cart.project');
+    Route::delete('/clear-cart-project', [CartController::class, 'clearcartProject'])->name('clear.cart.project');
+    
+    /*payment */
+    Route::post('/knet/request', [MyFatoorahController::class, 'index'])->name('myfatoorah.request');
+    Route::get('/knet/callback', [MyFatoorahController::class, 'callback'])->name('myfatoorah.callback');
+    Route::get('/knet/knet_success/{id}', [MyFatoorahController::class, 'knet_success'])->name('myfatoorah.knet_success');
+    Route::get('/knet/knet_error/{id}', [MyFatoorahController::class, 'knet_error'])->name('myfatoorah.knet_error');
+    Route::get('/knet/knet_expired', [MyFatoorahController::class, 'knet_expired'])->name('myfatoorah.knet_expired');
+    
+    /*for recurring payment */
+    //Route::post('/knet/emmbedded_session', [MyFatoorahController::class, 'emmbedded_session'])->name('myfatoorah.emmbedded_session');
+     
+    Route::post('/knet/recurring_request', [MyFatoorahController::class, 'recurring_request'])->name('myfatoorah.recurring_request');
+    Route::get('/knet/callback_recurring', [MyFatoorahController::class, 'callback_recurring'])->name('myfatoorah.callback_recurring');
+    Route::get('/knet/knet_recurring_success/{id}', [MyFatoorahController::class, 'knet_recurring_success'])->name('myfatoorah.knet_recurring_success');
+    Route::get('/knet/knet_recurring_error/{id}', [MyFatoorahController::class, 'knet_recurring_error'])->name('myfatoorah.knet_recurring_error');
+    
+    
+    Route::post('/knet/fastdonation_request', [MyFatoorahController::class, 'fastdonation_request'])->name('myfatoorah.fastdonation_request');
+    
+    
+    /*payment cart */
+    Route::post('/knet/cartpayment', [MyFatoorahController::class, 'cartpayment'])->name('myfatoorah.cartpayment');
+    Route::get('/knet/callback-cart', [MyFatoorahController::class, 'callback_cart'])->name('myfatoorah.callback_cart');
+    Route::get('/knet/knet_cart_success/{id}', [MyFatoorahController::class, 'knet_cart_success'])->name('myfatoorah.knet_cart_success');
+    Route::get('/knet/knet_cart_error/{id}', [MyFatoorahController::class, 'knet_cart_error'])->name('myfatoorah.knet_cart_error');
+    Route::get('/knet/knet_cart_expired', [MyFatoorahController::class, 'knet_cart_expired'])->name('myfatoorah.knet_cart_expired');
+    
+    
+    /*payment for dedication */
+    Route::post('/knet/dedication_request', [MyFatoorahController::class, 'dedication_request'])->name('myfatoorah.dedication_request');
+    Route::get('/knet/dedication_callback', [MyFatoorahController::class, 'dedication_callback'])->name('myfatoorah.dedication_callback');
+    Route::get('/knet/dedication_success/{id}', [MyFatoorahController::class, 'dedication_success'])->name('myfatoorah.dedication_success');
+    Route::get('/knet/dedication_error/{id}', [MyFatoorahController::class, 'dedication_error'])->name('myfatoorah.dedication_error');
+    Route::get('/knet/dedication_expired', [MyFatoorahController::class, 'dedication_expired'])->name('myfatoorah.dedication_expired');
+    
+    /*add wallet */
+    Route::post('/knet/addwallet_request', [MyFatoorahController::class, 'addwallet_request'])->name('myfatoorah.addwallet_request');
+    Route::get('/knet/callback-addwallet', [MyFatoorahController::class, 'callback_addwallet'])->name('myfatoorah.callback_addwallet');
+    
+  
+  Route::get('/{id}/{code}/', [ChooseDonationamountController::class, 'setmarketer']);
+		
 });
+
+
